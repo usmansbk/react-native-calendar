@@ -8,7 +8,7 @@ export const colors = {
   lightGray: '#ecf0f1',
   white: 'white',
 };
+export const FOOTER_HEIGHT = 32;
 export const NUMBER_OF_ROWS = 6;
 export const ROW_HEIGHT = BUTTON_SIZE + 4; // 4 is the sum of top and bottom margin
-export const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS + ROW_HEIGHT;
-export const FOOTER_HEIGHT = 32;
+export const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS + FOOTER_HEIGHT;
