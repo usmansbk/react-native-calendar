@@ -30,7 +30,7 @@ import {
 } from './constants';
 
 const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
-const MINIMUM_SWIPE_DOWN_VELOCITY = 0.25;
+const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
 
 export default function Calendar({
   markedDates = mockMarkedDates,
