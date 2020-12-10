@@ -2,16 +2,21 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import {
   getDate,
+  getMonth,
   formatMonthHeader,
   generateMonthMatrix,
   mockMarkedDates,
   isMarked,
+  isSameDay,
+  isToday,
+  isSameMonth,
 } from './utils';
 import {colors, CALENDAR_HEIGHT, DAYS_OF_WEEK, BUTTON_SIZE} from './constants';
 
 export default function Calendar({markedDates = mockMarkedDates}) {
   const [date, setDate] = useState(getDate());
-  const rows = useMemo(() => generateMonthMatrix(date), [date]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
   const onPressDay = useCallback((day) => {
     requestAnimationFrame(() => {
       setDate(day);
@@ -22,13 +27,18 @@ export default function Calendar({markedDates = mockMarkedDates}) {
     <View style={[styles.container]}>
       <MonthHeader title={formatMonthHeader(date)} />
       <WeekHeader />
-      <Rows rows={rows} onPressDay={onPressDay} markedDates={markedDates} />
+      <Rows
+        rows={rows}
+        onPressDay={onPressDay}
+        markedDates={markedDates}
+        date={date}
+      />
       <Footer />
     </View>
   );
 }
 
-function Rows({rows = [], onPressDay, markedDates = []}) {
+function Rows({rows = [], onPressDay, markedDates = [], date}) {
   return (
     <Animated.ScrollView
       showsVerticalScrollIndicator={false}
@@ -36,6 +46,7 @@ function Rows({rows = [], onPressDay, markedDates = []}) {
       style={[styles.rows]}>
       {rows.map((row, index) => (
         <Row
+          date={date}
           key={index}
           row={row}
           onPressDay={onPressDay}
@@ -46,11 +57,12 @@ function Rows({rows = [], onPressDay, markedDates = []}) {
   );
 }
 
-function Row({row = [], onPressDay, markedDates = []}) {
+function Row({row = [], onPressDay, markedDates = [], date}) {
   return (
     <View style={[styles.row]}>
       {row.map((day, index) => (
         <Day
+          date={date}
           key={index}
           day={day}
           onPressDay={onPressDay}
@@ -61,34 +73,34 @@ function Row({row = [], onPressDay, markedDates = []}) {
   );
 }
 
-function Day({day, onPressDay, marked}) {
+function Day({day, onPressDay, marked, date}) {
   const onPress = useCallback(() => onPressDay(day.isoString), [
     day.isoString,
     onPressDay,
   ]);
+  const sameDay = isSameDay(day.isoString, date);
+  const today = isToday(day.isoString);
+  const thisMonth = isSameMonth(day.isoString, date);
+
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[
         styles.day,
-        day.isSelected
-          ? day.isToday
-            ? styles.today
-            : styles.selected
-          : undefined,
+        sameDay ? (today ? styles.today : styles.selected) : undefined,
       ]}>
       <Text
         style={[
-          day.isSameMonth ? styles.sameMonth : styles.dayText,
-          day.isToday
-            ? day.isSelected
+          thisMonth ? styles.sameMonth : styles.dayText,
+          today
+            ? sameDay
               ? styles.todayText
               : styles.todayTextBlur
             : undefined,
         ]}>
         {day.date}
       </Text>
-      {marked && <Dot contrast={day.isToday && day.isSelected} />}
+      {marked && <Dot contrast={today && sameDay} />}
     </TouchableOpacity>
   );
 }

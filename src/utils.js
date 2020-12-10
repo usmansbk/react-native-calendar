@@ -8,6 +8,10 @@ export function getDate() {
   return moment();
 }
 
+export function getMonth(date) {
+  return moment(date).month();
+}
+
 export function formatMonthHeader(date) {
   return moment(date).format('MMMM YYYY');
 }
@@ -41,9 +45,6 @@ export function generateMonthMatrix(date) {
         date: day.date(),
         month: day.month(),
         year: day.year(),
-        isSameMonth: momentDate.isSame(day, 'month'),
-        isToday: moment().isSame(day, 'day'),
-        isSelected: momentDate.isSame(day, 'day'),
         isoString: day.toISOString(),
       });
     }
@@ -51,6 +52,18 @@ export function generateMonthMatrix(date) {
   }
 
   return grid;
+}
+
+export function isSameMonth(date1, date2) {
+  return moment(date1).isSame(date2, 'month');
+}
+
+export function isToday(date) {
+  return isSameDay(moment(), date);
+}
+
+export function isSameDay(date1, date2) {
+  return moment(date1).isSame(date2, 'day');
 }
 
 export function isMarked(markedDates = [], date) {
