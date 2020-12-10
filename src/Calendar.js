@@ -13,6 +13,7 @@ const colors = {
   black: '#313131',
   gray: '#9A9A9A',
   backgroundColor: 'white',
+  primary: '#3498db',
 };
 const ROW_HEIGHT = BUTTON_SIZE + 4; // 4 is the sum of top and bottom margin
 const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS;
@@ -86,6 +87,7 @@ function Day({day, onPressDay, marked}) {
         ]}>
         {day.date}
       </Text>
+      <Dot contrast={day.isToday && day.isSelected} />
     </TouchableOpacity>
   );
 }
@@ -118,6 +120,12 @@ function Footer() {
         style={[styles.arrow]}
       />
     </View>
+  );
+}
+
+function Dot({contrast}) {
+  return (
+    <View style={[styles.dot, contrast ? styles.contrastDot : undefined]} />
   );
 }
 
@@ -177,7 +185,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   today: {
-    backgroundColor: 'tomato',
+    backgroundColor: colors.primary,
   },
   selected: {
     borderWidth: 1,
@@ -187,7 +195,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   todayTextBlur: {
-    color: 'tomato',
+    color: colors.primary,
   },
   row: {
     flexDirection: 'row',
@@ -195,5 +203,14 @@ const styles = StyleSheet.create({
   },
   rows: {
     height: CALENDAR_HEIGHT,
+  },
+  dot: {
+    height: 4,
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: colors.gray,
+  },
+  contrastDot: {
+    backgroundColor: 'white',
   },
 });
