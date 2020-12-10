@@ -13,25 +13,33 @@ import {
 } from './utils';
 import {colors, CALENDAR_HEIGHT, DAYS_OF_WEEK, BUTTON_SIZE} from './constants';
 
-export default function Calendar({markedDates = mockMarkedDates}) {
-  const [date, setDate] = useState(getDate());
+export default function Calendar({
+  markedDates = mockMarkedDates,
+  date = getDate(),
+  onDateChange = () => null,
+}) {
+  const [_date, setDate] = useState(date);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
-  const onPressDay = useCallback((day) => {
-    requestAnimationFrame(() => {
-      setDate(day);
-    });
-  }, []);
+  const rows = useMemo(() => generateMonthMatrix(_date), [getMonth(_date)]);
+  const onPressDay = useCallback(
+    (day) => {
+      requestAnimationFrame(() => {
+        setDate(day);
+        onDateChange?.(day);
+      });
+    },
+    [onDateChange],
+  );
 
   return (
     <View style={[styles.container]}>
-      <MonthHeader title={formatMonthHeader(date)} />
+      <MonthHeader title={formatMonthHeader(_date)} />
       <WeekHeader />
       <Rows
         rows={rows}
         onPressDay={onPressDay}
         markedDates={markedDates}
-        date={date}
+        date={_date}
       />
       <Footer />
     </View>
