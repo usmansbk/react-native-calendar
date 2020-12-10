@@ -1,5 +1,13 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  TouchableOpacity,
+  PanResponder,
+  ScrollView,
+} from 'react-native';
 import {
   getDate,
   getMonth,
@@ -11,7 +19,14 @@ import {
   isToday,
   isSameMonth,
 } from './utils';
-import {colors, CALENDAR_HEIGHT, DAYS_OF_WEEK, BUTTON_SIZE} from './constants';
+import {
+  colors,
+  CALENDAR_HEIGHT,
+  DAYS_OF_WEEK,
+  BUTTON_SIZE,
+  ROW_HEIGHT,
+  FOOTER_HEIGHT,
+} from './constants';
 
 export default function Calendar({
   markedDates = mockMarkedDates,
@@ -41,28 +56,77 @@ export default function Calendar({
         markedDates={markedDates}
         date={_date}
       />
-      <Footer />
     </View>
   );
 }
 
-function Rows({rows = [], onPressDay, markedDates = [], date}) {
-  return (
-    <Animated.ScrollView
-      showsVerticalScrollIndicator={false}
-      scrollEnabled={false}
-      style={[styles.rows]}>
-      {rows.map((row, index) => (
-        <Row
-          date={date}
-          key={index}
-          row={row}
-          onPressDay={onPressDay}
-          markedDates={markedDates}
-        />
-      ))}
-    </Animated.ScrollView>
-  );
+class Rows extends React.Component {
+  constructor(props) {
+    super(props);
+    this.animation = new Animated.ValueXY(0);
+    this.onPressDay = props.onPressDay;
+  }
+
+  panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, gestureState) => {
+      this.animation.y.setValue(gestureState.dy);
+    },
+  });
+
+  render() {
+    const {rows = [], markedDates = [], date} = this.props;
+    return (
+      <Animated.View
+        {...this.panResponder.panHandlers}
+        style={
+          (styles.rows,
+          [
+            {
+              height: this.animation.y.interpolate({
+                inputRange: [0, CALENDAR_HEIGHT],
+                outputRange: [ROW_HEIGHT + FOOTER_HEIGHT, CALENDAR_HEIGHT],
+                extrapolate: 'clamp',
+              }),
+            },
+          ])
+        }>
+        <ScrollView
+          ref={(ref) => (this.scrollView = ref)}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}>
+          {rows.map((row, index) => (
+            <Row
+              date={date}
+              key={index}
+              row={row}
+              onPressDay={this.onPressDay}
+              markedDates={markedDates}
+            />
+          ))}
+        </ScrollView>
+        <View style={[styles.footer]}>
+          <Animated.Image
+            source={require('./img/arrow.png')}
+            style={[
+              styles.arrow,
+              {
+                transform: [
+                  {
+                    rotateX: this.animation.y.interpolate({
+                      inputRange: [0, CALENDAR_HEIGHT],
+                      outputRange: ['180deg', '0deg'],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+        </View>
+      </Animated.View>
+    );
+  }
 }
 
 function Row({row = [], onPressDay, markedDates = [], date}) {
@@ -133,17 +197,6 @@ function MonthHeader({title}) {
   );
 }
 
-function Footer() {
-  return (
-    <View style={[styles.footer]}>
-      <Animated.Image
-        source={require('./img/arrow.png')}
-        style={[styles.arrow]}
-      />
-    </View>
-  );
-}
-
 function Dot({contrast}) {
   return (
     <View style={[styles.dot, contrast ? styles.contrastDot : undefined]} />
@@ -168,12 +221,12 @@ const styles = StyleSheet.create({
   arrow: {
     width: 14,
     height: 14,
-    transform: [{rotateX: '180deg'}],
   },
   footer: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 8,
+    height: FOOTER_HEIGHT,
+    backgroundColor: colors.white, // PanResponder doesn't work without background color set for View
   },
   weekHeader: {
     flexDirection: 'row',
