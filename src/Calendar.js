@@ -38,11 +38,13 @@ export default function Calendar() {
 
 function Rows({rows = [], onPressDay}) {
   return (
-    <View style={[styles.rows]}>
+    <Animated.ScrollView
+      showsVerticalScrollIndicator={false}
+      style={[styles.rows]}>
       {rows.map((row, index) => (
         <Row key={index} row={row} onPressDay={onPressDay} />
       ))}
-    </View>
+    </Animated.ScrollView>
   );
 }
 
