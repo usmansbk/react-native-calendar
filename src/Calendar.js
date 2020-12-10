@@ -40,6 +40,7 @@ function Rows({rows = [], onPressDay}) {
   return (
     <Animated.ScrollView
       showsVerticalScrollIndicator={false}
+      scrollEnabled={false}
       style={[styles.rows]}>
       {rows.map((row, index) => (
         <Row key={index} row={row} onPressDay={onPressDay} />
@@ -58,7 +59,7 @@ function Row({row = [], onPressDay}) {
   );
 }
 
-function Day({day, onPressDay}) {
+function Day({day, onPressDay, marked}) {
   const onPress = useCallback(() => onPressDay(day.moment), [
     day.moment,
     onPressDay,
