@@ -5,6 +5,8 @@ import {
   formatMonthHeader,
   generateMonthMatrix,
   NUMBER_OF_ROWS,
+  mockMarkedDates,
+  isMarked,
 } from './utils';
 
 const BUTTON_SIZE = 48;
@@ -14,11 +16,13 @@ const colors = {
   gray: '#9A9A9A',
   backgroundColor: 'white',
   primary: '#3498db',
+  lightGray: '#ecf0f1',
+  white: 'white',
 };
 const ROW_HEIGHT = BUTTON_SIZE + 4; // 4 is the sum of top and bottom margin
 const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS;
 
-export default function Calendar() {
+export default function Calendar({markedDates = mockMarkedDates}) {
   const [date, setDate] = useState(getDate());
   const rows = generateMonthMatrix(date);
   const onPressDay = (day) => {
@@ -31,38 +35,50 @@ export default function Calendar() {
     <View style={[styles.container]}>
       <MonthHeader title={formatMonthHeader(date)} />
       <WeekHeader />
-      <Rows rows={rows} onPressDay={onPressDay} />
+      <Rows rows={rows} onPressDay={onPressDay} markedDates={markedDates} />
       <Footer />
     </View>
   );
 }
 
-function Rows({rows = [], onPressDay}) {
+function Rows({rows = [], onPressDay, markedDates = []}) {
   return (
     <Animated.ScrollView
       showsVerticalScrollIndicator={false}
       scrollEnabled={false}
       style={[styles.rows]}>
       {rows.map((row, index) => (
-        <Row key={index} row={row} onPressDay={onPressDay} />
+        <Row
+          key={index}
+          row={row}
+          onPressDay={onPressDay}
+          markedDates={markedDates}
+        />
       ))}
     </Animated.ScrollView>
   );
 }
 
-function Row({row = [], onPressDay}) {
+function Row({row = [], onPressDay, markedDates = []}) {
+  console.log(markedDates);
   return (
     <View style={[styles.row]}>
       {row.map((day, index) => (
-        <Day key={index} day={day} onPressDay={onPressDay} />
+        <Day
+          key={index}
+          day={day}
+          onPressDay={onPressDay}
+          marked={isMarked(markedDates, day.isoString)}
+        />
       ))}
     </View>
   );
 }
 
 function Day({day, onPressDay, marked}) {
-  const onPress = useCallback(() => onPressDay(day.moment), [
-    day.moment,
+  console.log(day);
+  const onPress = useCallback(() => onPressDay(day.isoString), [
+    day.isoString,
     onPressDay,
   ]);
   return (
@@ -87,7 +103,7 @@ function Day({day, onPressDay, marked}) {
         ]}>
         {day.date}
       </Text>
-      <Dot contrast={day.isToday && day.isSelected} />
+      {marked && <Dot contrast={day.isToday && day.isSelected} />}
     </TouchableOpacity>
   );
 }
@@ -188,11 +204,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   selected: {
-    borderWidth: 1,
-    borderColor: colors.gray,
+    backgroundColor: colors.lightGray,
   },
   todayText: {
-    color: 'white',
+    color: colors.white,
   },
   todayTextBlur: {
     color: colors.primary,
@@ -209,8 +224,10 @@ const styles = StyleSheet.create({
     width: 4,
     borderRadius: 2,
     backgroundColor: colors.gray,
+    position: 'absolute',
+    bottom: 10,
   },
   contrastDot: {
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
   },
 });

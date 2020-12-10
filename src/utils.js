@@ -44,7 +44,7 @@ export function generateMonthMatrix(date) {
         isSameMonth: momentDate.isSame(day, 'month'),
         isToday: moment().isSame(day, 'day'),
         isSelected: momentDate.isSame(day, 'day'),
-        moment: day.clone(),
+        isoString: day.toISOString(),
       });
     }
     grid.push(row);
@@ -52,3 +52,14 @@ export function generateMonthMatrix(date) {
 
   return grid;
 }
+
+export function isMarked(markedDates = [], date) {
+  return markedDates.some((val) => moment(val).isSame(date, 'day'));
+}
+
+export const mockMarkedDates = [
+  moment().toISOString(),
+  moment().add(3, 'days').toISOString(),
+  moment().add(8, 'days').toISOString(),
+  moment().add(12, 'days').toISOString(),
+];
