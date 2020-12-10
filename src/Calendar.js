@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   PanResponder,
   ScrollView,
+  Image,
 } from 'react-native';
 import {
   getDate,
@@ -106,10 +107,8 @@ class Rows extends React.Component {
           ))}
         </ScrollView>
         <View style={[styles.footer]}>
-          <Animated.Image
-            source={require('./img/arrow.png')}
+          <Animated.View
             style={[
-              styles.arrow,
               {
                 transform: [
                   {
@@ -121,8 +120,9 @@ class Rows extends React.Component {
                   },
                 ],
               },
-            ]}
-          />
+            ]}>
+            <Image source={require('./img/arrow.png')} style={styles.arrow} />
+          </Animated.View>
         </View>
       </Animated.View>
     );
