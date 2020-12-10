@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import {getDate, formatMonthHeader} from './utils';
 
 const BUTTON_SIZE = 48;
-const DEFAULT_SHORT_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function Calendar() {
   const [date] = useState(getDate());
@@ -16,10 +16,10 @@ export default function Calendar() {
   );
 }
 
-function WeekHeader({shortNames = DEFAULT_SHORT_NAMES}) {
+function WeekHeader({names = DAYS_OF_WEEK}) {
   return (
     <View style={[styles.weekHeader]}>
-      {shortNames.map((name, index) => (
+      {names.map((name, index) => (
         <View key={index} style={[styles.weekday]}>
           <Text style={[styles.weekHeaderText]}>{name}</Text>
         </View>
