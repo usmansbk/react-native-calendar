@@ -1,18 +1,48 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
-import {getDate, formatMonthHeader} from './utils';
+import {getDate, formatMonthHeader, generateMonthMatrix} from './utils';
 
 const BUTTON_SIZE = 48;
-const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const colors = {
+  black: '#313131',
+  gray: '#9A9A9A',
+};
 
 export default function Calendar() {
   const [date] = useState(getDate());
+  const rows = generateMonthMatrix(date);
   return (
     <View style={[styles.container]}>
       <MonthHeader title={formatMonthHeader(date)} />
       <WeekHeader />
+      <Rows rows={rows} />
       <Footer />
     </View>
+  );
+}
+
+function Rows({rows = []}) {
+  return rows.map((row, index) => <Row key={index} row={row} />);
+}
+
+function Row({row = []}) {
+  return (
+    <View style={[styles.row]}>
+      {row.map((day, index) => (
+        <Day key={index} day={day} />
+      ))}
+    </View>
+  );
+}
+
+function Day({day}) {
+  return (
+    <TouchableOpacity style={[styles.day]}>
+      <Text style={[day.isSameMonth ? styles.sameMonth : styles.dayText]}>
+        {day.date}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
@@ -59,7 +89,7 @@ const styles = StyleSheet.create({
   },
   monthHeaderText: {
     textTransform: 'uppercase',
-    color: '#313131',
+    color: colors.black,
     fontWeight: 'bold',
   },
   arrow: {
@@ -79,7 +109,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   weekHeaderText: {
-    color: '#9A9A9A',
+    color: colors.gray,
     textTransform: 'uppercase',
     fontSize: 12,
   },
@@ -89,11 +119,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
-  button: {
+  day: {
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
     borderRadius: BUTTON_SIZE / 2,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dayText: {
+    color: colors.gray,
+  },
+  sameMonth: {
+    color: colors.black,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

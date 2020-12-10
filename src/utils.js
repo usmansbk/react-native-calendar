@@ -1,5 +1,9 @@
 import moment from 'moment';
 
+const NUMBER_OF_ROWS = 6;
+const DAYS_PER_WEEK = 7;
+const DAYS_PER_PAGE = NUMBER_OF_ROWS * DAYS_PER_WEEK;
+
 export function getDate() {
   return moment();
 }
@@ -23,6 +27,26 @@ export function formatMonthHeader(date) {
  * @param {moment.Moment} date
  */
 export function generateMonthMatrix(date) {
+  const momentDate = moment(date);
+  const firstDateOfMonth = momentDate.clone().startOf('month');
+  const firstStartOfWeek = firstDateOfMonth.clone().startOf('week');
+
   const grid = [];
+
+  for (let i = 0; i < DAYS_PER_PAGE; i += DAYS_PER_WEEK) {
+    const row = [];
+    for (let j = i; j < i + DAYS_PER_WEEK; j++) {
+      const day = firstStartOfWeek.clone().add(j, 'day');
+      row.push({
+        date: day.date(),
+        month: day.month(),
+        year: day.year(),
+        isSameMonth: momentDate.isSame(day, 'month'),
+        isToday: momentDate.isSame(day, 'day'),
+      });
+    }
+    grid.push(row);
+  }
+
   return grid;
 }
