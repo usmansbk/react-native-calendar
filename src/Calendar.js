@@ -14,7 +14,7 @@ const colors = {
   gray: '#9A9A9A',
   backgroundColor: 'white',
 };
-const ROW_HEIGHT = BUTTON_SIZE + 2; // 2 is the marginVertical
+const ROW_HEIGHT = BUTTON_SIZE + 4; // 4 is the sum of top and bottom margin
 const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS;
 
 export default function Calendar() {
@@ -37,9 +37,13 @@ export default function Calendar() {
 }
 
 function Rows({rows = [], onPressDay}) {
-  return rows.map((row, index) => (
-    <Row key={index} row={row} onPressDay={onPressDay} />
-  ));
+  return (
+    <View style={[styles.rows]}>
+      {rows.map((row, index) => (
+        <Row key={index} row={row} onPressDay={onPressDay} />
+      ))}
+    </View>
+  );
 }
 
 function Row({row = [], onPressDay}) {
@@ -185,5 +189,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  rows: {
+    height: CALENDAR_HEIGHT,
   },
 });
