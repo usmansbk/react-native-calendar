@@ -47,7 +47,6 @@ function Rows({rows = [], onPressDay, markedDates = []}) {
 }
 
 function Row({row = [], onPressDay, markedDates = []}) {
-  console.log(markedDates);
   return (
     <View style={[styles.row]}>
       {row.map((day, index) => (
