@@ -6,8 +6,8 @@ import {
   Animated,
   TouchableOpacity,
   PanResponder,
-  ScrollView,
   Image,
+  ScrollView,
 } from 'react-native';
 import {
   getDate,
@@ -135,19 +135,29 @@ class Rows extends React.Component {
             },
           ])
         }>
-        <ScrollView
-          ref={(ref) => (this.scrollView = ref)}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}>
-          {rows.map((row, index) => (
-            <Row
-              date={date}
-              key={index}
-              row={row}
-              onPressDay={this.onPressDay}
-              markedDates={markedDates}
-            />
-          ))}
+        <ScrollView showsVerticalScrollIndicator={false} scrollEnabled={false}>
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  translateY: this.animation.y.interpolate({
+                    inputRange: [0, CALENDAR_HEIGHT],
+                    outputRange: [-ROW_HEIGHT, 0],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ],
+            }}>
+            {rows.map((row, index) => (
+              <Row
+                date={date}
+                key={index}
+                row={row}
+                onPressDay={this.onPressDay}
+                markedDates={markedDates}
+              />
+            ))}
+          </Animated.View>
         </ScrollView>
         <View style={[styles.footer]}>
           <Animated.View
