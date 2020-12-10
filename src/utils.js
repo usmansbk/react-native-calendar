@@ -42,7 +42,9 @@ export function generateMonthMatrix(date) {
         month: day.month(),
         year: day.year(),
         isSameMonth: momentDate.isSame(day, 'month'),
-        isToday: momentDate.isSame(day, 'day'),
+        isToday: moment().isSame(day, 'day'),
+        isSelected: momentDate.isSame(day, 'day'),
+        moment: day.clone(),
       });
     }
     grid.push(row);
