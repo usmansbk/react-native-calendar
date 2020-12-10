@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import {getDate, formatMonthHeader} from './utils';
 
 const BUTTON_SIZE = 48;
+const DEFAULT_SHORT_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function Calendar() {
   const [date] = useState(getDate());
@@ -15,12 +16,11 @@ export default function Calendar() {
   );
 }
 
-function WeekHeader() {
-  const shortNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+function WeekHeader({shortNames = DEFAULT_SHORT_NAMES}) {
   return (
     <View style={[styles.weekHeader]}>
       {shortNames.map((name, index) => (
-        <View key={index} style={styles.button}>
+        <View key={index} style={[styles.weekday]}>
           <Text style={[styles.weekHeaderText]}>{name}</Text>
         </View>
       ))}
@@ -38,7 +38,7 @@ function MonthHeader({title}) {
 
 function Footer() {
   return (
-    <View style={styles.footer}>
+    <View style={[styles.footer]}>
       <Animated.Image
         source={require('./img/arrow.png')}
         style={[styles.arrow]}
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   arrow: {
     width: 14,
     height: 14,
+    transform: [{rotateX: '180deg'}],
   },
   footer: {
     justifyContent: 'center',
@@ -79,7 +80,14 @@ const styles = StyleSheet.create({
   },
   weekHeaderText: {
     color: '#9A9A9A',
-    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    fontSize: 12,
+  },
+  weekday: {
+    width: BUTTON_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 8,
   },
   button: {
     width: BUTTON_SIZE,
