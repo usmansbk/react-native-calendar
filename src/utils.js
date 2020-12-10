@@ -16,6 +16,15 @@ export function formatMonthHeader(date) {
   return moment(date).format('MMMM YYYY');
 }
 
+export function getDateRow(date) {
+  const momentDate = moment(date);
+  const firstDateOfMonth = momentDate.clone().startOf('month');
+  const firstStartOfWeek = firstDateOfMonth.clone().startOf('week');
+  const numberOfDaysFromStart = momentDate.diff(firstStartOfWeek, 'days');
+
+  return Math.floor(numberOfDaysFromStart / DAYS_PER_WEEK);
+}
+
 /**
  *
  * returns a 7 by 6 multidimensional array of the given date month.

@@ -12,6 +12,7 @@ import {
 import {
   getDate,
   getMonth,
+  getDateRow,
   formatMonthHeader,
   generateMonthMatrix,
   mockMarkedDates,
@@ -40,6 +41,7 @@ export default function Calendar({
   const [_date, setDate] = useState(date);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows = useMemo(() => generateMonthMatrix(_date), [getMonth(_date)]);
+  const dateRow = useMemo(() => getDateRow(_date), [_date]);
   const onPressDay = useCallback(
     (day) => {
       requestAnimationFrame(() => {
@@ -59,6 +61,7 @@ export default function Calendar({
         onPressDay={onPressDay}
         markedDates={markedDates}
         date={_date}
+        dateRow={dateRow}
       />
     </View>
   );
@@ -119,7 +122,7 @@ class Rows extends React.Component {
   });
 
   render() {
-    const {rows = [], markedDates = [], date} = this.props;
+    const {rows = [], markedDates = [], date, dateRow} = this.props;
     return (
       <Animated.View
         {...this.panResponder.panHandlers}
@@ -142,7 +145,7 @@ class Rows extends React.Component {
                 {
                   translateY: this.animation.y.interpolate({
                     inputRange: [0, CALENDAR_HEIGHT],
-                    outputRange: [-ROW_HEIGHT, 0],
+                    outputRange: [-ROW_HEIGHT * dateRow, 0],
                     extrapolate: 'clamp',
                   }),
                 },
