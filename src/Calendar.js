@@ -1,6 +1,11 @@
 import React, {useCallback, useState} from 'react';
 import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
-import {getDate, formatMonthHeader, generateMonthMatrix} from './utils';
+import {
+  getDate,
+  formatMonthHeader,
+  generateMonthMatrix,
+  NUMBER_OF_ROWS,
+} from './utils';
 
 const BUTTON_SIZE = 48;
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -9,6 +14,8 @@ const colors = {
   gray: '#9A9A9A',
   backgroundColor: 'white',
 };
+const ROW_HEIGHT = BUTTON_SIZE + 2; // 2 is the marginVertical
+const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS;
 
 export default function Calendar() {
   const [date, setDate] = useState(getDate());
@@ -130,8 +137,7 @@ const styles = StyleSheet.create({
   footer: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 8,
-    paddingBottom: 4,
+    padding: 8,
   },
   weekHeader: {
     flexDirection: 'row',

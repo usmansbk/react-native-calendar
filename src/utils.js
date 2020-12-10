@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-const NUMBER_OF_ROWS = 6;
+export const NUMBER_OF_ROWS = 6;
 const DAYS_PER_WEEK = 7;
 const DAYS_PER_PAGE = NUMBER_OF_ROWS * DAYS_PER_WEEK;
 
