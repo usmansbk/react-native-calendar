@@ -29,6 +29,9 @@ import {
   FOOTER_HEIGHT,
 } from './constants';
 
+const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
+const MINIMUM_SWIPE_DOWN_VELOCITY = 0.25;
+
 export default function Calendar({
   markedDates = mockMarkedDates,
   date = getDate(),
@@ -64,14 +67,54 @@ export default function Calendar({
 class Rows extends React.Component {
   constructor(props) {
     super(props);
-    this.animation = new Animated.ValueXY(0);
     this.onPressDay = props.onPressDay;
   }
 
+  animation = new Animated.ValueXY();
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
-    onPanResponderMove: (_, gestureState) => {
-      this.animation.y.setValue(gestureState.dy);
+    onPanResponderGrant: () => {
+      // using extractOffset doesn't work as expected
+      this.animation.setOffset({
+        x: this.animation.x._value,
+        y: this.animation.y._value,
+      });
+    },
+    onPanResponderMove: Animated.event(
+      [null, {dx: this.animation.x, dy: this.animation.y}],
+      {useNativeDriver: false},
+    ),
+    onPanResponderRelease: (_, {dy, vy}) => {
+      if (dy > 0) {
+        // swipe down
+
+        if (
+          Math.abs(dy) > MINIMUM_SWIPE_DOWN ||
+          vy > MINIMUM_SWIPE_DOWN_VELOCITY
+        ) {
+          // second row is now visible or swipe down fast
+          Animated.timing(this.animation.y, {
+            toValue: CALENDAR_HEIGHT,
+            duration: 300,
+            useNativeDriver: false,
+          }).start(() => this.animation.flattenOffset());
+        } else {
+          Animated.timing(this.animation.y, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+          }).start(() => this.animation.flattenOffset());
+        }
+      } else {
+        // swipe up
+        Animated.timing(this.animation.y, {
+          toValue: -CALENDAR_HEIGHT,
+          duration: 300,
+          useNativeDriver: false,
+        }).start(() => {
+          this.animation.flattenOffset();
+        });
+      }
     },
   });
 
