@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import {
   getDate,
@@ -24,12 +24,12 @@ const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS;
 
 export default function Calendar({markedDates = mockMarkedDates}) {
   const [date, setDate] = useState(getDate());
-  const rows = generateMonthMatrix(date);
-  const onPressDay = (day) => {
+  const rows = useMemo(() => generateMonthMatrix(date), [date]);
+  const onPressDay = useCallback((day) => {
     requestAnimationFrame(() => {
       setDate(day);
     });
-  };
+  }, []);
 
   return (
     <View style={[styles.container]}>
@@ -76,7 +76,6 @@ function Row({row = [], onPressDay, markedDates = []}) {
 }
 
 function Day({day, onPressDay, marked}) {
-  console.log(day);
   const onPress = useCallback(() => onPressDay(day.isoString), [
     day.isoString,
     onPressDay,
