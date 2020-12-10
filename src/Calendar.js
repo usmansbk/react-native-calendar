@@ -4,23 +4,10 @@ import {
   getDate,
   formatMonthHeader,
   generateMonthMatrix,
-  NUMBER_OF_ROWS,
   mockMarkedDates,
   isMarked,
 } from './utils';
-
-const BUTTON_SIZE = 48;
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const colors = {
-  black: '#313131',
-  gray: '#9A9A9A',
-  backgroundColor: 'white',
-  primary: '#3498db',
-  lightGray: '#ecf0f1',
-  white: 'white',
-};
-const ROW_HEIGHT = BUTTON_SIZE + 4; // 4 is the sum of top and bottom margin
-const CALENDAR_HEIGHT = ROW_HEIGHT * NUMBER_OF_ROWS;
+import {colors, CALENDAR_HEIGHT, DAYS_OF_WEEK, BUTTON_SIZE} from './constants';
 
 export default function Calendar({markedDates = mockMarkedDates}) {
   const [date, setDate] = useState(getDate());
