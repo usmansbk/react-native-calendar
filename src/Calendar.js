@@ -13,8 +13,6 @@ import {
   getDate,
   getMonth,
   getDateRow,
-  getNextMonth,
-  getPreviousMonth,
   formatMonthHeader,
   generateMonthMatrix,
   mockMarkedDates,
