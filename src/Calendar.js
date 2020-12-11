@@ -247,29 +247,33 @@ function Day({day, onPress, marked, date, styles}) {
     day.isoString,
     onPress,
   ]);
-  const sameDay = isSameDay(day.isoString, date);
-  const today = isToday(day.isoString);
-  const thisMonth = isSameMonth(day.isoString, date);
+  const isSelected = isSameDay(day.isoString, date);
+  const isTodaysDate = isToday(day.isoString);
+  const isInMonth = isSameMonth(day.isoString, date);
 
   return (
     <TouchableOpacity
       onPress={_onPress}
       style={[
         styles.day,
-        sameDay ? (today ? styles.today : styles.selected) : undefined,
+        isSelected
+          ? isTodaysDate
+            ? styles.today
+            : styles.selected
+          : undefined,
       ]}>
       <Text
         style={[
-          thisMonth ? styles.sameMonth : styles.dayText,
-          today
-            ? sameDay
+          isInMonth ? styles.sameMonth : styles.dayText,
+          isTodaysDate
+            ? isSelected
               ? styles.todayText
               : styles.todayTextBlur
             : undefined,
         ]}>
         {day.date}
       </Text>
-      {marked && <Dot contrast={today && sameDay} styles={styles} />}
+      {marked && <Dot contrast={isTodaysDate && isSelected} styles={styles} />}
     </TouchableOpacity>
   );
 }
