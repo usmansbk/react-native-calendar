@@ -37,6 +37,7 @@ export default function SimpleCalendar({
   markedDates = mockMarkedDates,
   date = getDate(),
   onDateChange = () => null,
+  styles = {},
 }) {
   const [_date, setDate] = useState(date);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,7 +46,6 @@ export default function SimpleCalendar({
     getMonth(_date),
   ]);
 
-  const months = [currentMonthRows];
   const dateRow = useMemo(() => getDateRow(_date), [_date]);
   const onPressDay = useCallback(
     (day) => {
@@ -59,11 +59,12 @@ export default function SimpleCalendar({
 
   return (
     <Calendar
-      months={months}
+      rows={currentMonthRows}
       onPressDay={onPressDay}
       markedDates={markedDates}
       date={_date}
       dateRow={dateRow}
+      styles={styles}
     />
   );
 }
@@ -125,15 +126,16 @@ class Calendar extends React.Component {
   });
 
   render() {
-    const {markedDates = [], date, dateRow, months} = this.props;
+    const {markedDates = [], date, dateRow, rows, styles} = this.props;
     return (
-      <View style={[styles.container]}>
+      <View style={[defaultStyles.container, styles.container]}>
         <MonthHeader title={formatMonthHeader(date)} />
-        <WeekHeader />
+        <WeekHeader styles={styles} />
         <Animated.View
           {...this.panResponder.panHandlers}
           style={
-            (styles.rows,
+            (defaultStyles.rows,
+            styles.rows,
             [
               {
                 height: this.animation.y.interpolate({
@@ -159,22 +161,18 @@ class Calendar extends React.Component {
                   },
                 ],
               }}>
-              {months.map((rows, index) => {
-                return (
-                  <Animated.View style={[styles.months]}>
-                    <Rows
-                      key={index}
-                      rows={rows}
-                      date={date}
-                      onPressDay={this.onPressDay}
-                      markedDates={markedDates}
-                    />
-                  </Animated.View>
-                );
-              })}
+              <Animated.View style={[defaultStyles.months, styles.months]}>
+                <Rows
+                  rows={rows}
+                  date={date}
+                  onPressDay={this.onPressDay}
+                  markedDates={markedDates}
+                  styles={styles}
+                />
+              </Animated.View>
             </Animated.View>
           </ScrollView>
-          <View style={[styles.footer]}>
+          <View style={[defaultStyles.footer, styles.footer]}>
             <Animated.View
               style={[
                 {
@@ -189,7 +187,10 @@ class Calendar extends React.Component {
                   ],
                 },
               ]}>
-              <Image source={require('./img/arrow.png')} style={styles.arrow} />
+              <Image
+                source={require('./img/arrow.png')}
+                style={defaultStyles.arrow}
+              />
             </Animated.View>
           </View>
         </Animated.View>
@@ -198,9 +199,9 @@ class Calendar extends React.Component {
   }
 }
 
-function Rows({rows = [], date, markedDates, onPressDay}) {
+function Rows({rows = [], date, markedDates, onPressDay, styles}) {
   return (
-    <View style={styles.month}>
+    <View style={[defaultStyles.month, styles.month]}>
       {rows.map((row, index) => (
         <Row
           date={date}
@@ -208,15 +209,16 @@ function Rows({rows = [], date, markedDates, onPressDay}) {
           row={row}
           onPressDay={onPressDay}
           markedDates={markedDates}
+          styles={styles}
         />
       ))}
     </View>
   );
 }
 
-function Row({row = [], onPressDay, markedDates = [], date}) {
+function Row({row = [], onPressDay, markedDates = [], date, styles}) {
   return (
-    <View style={[styles.row]}>
+    <View style={[defaultStyles.row, styles.row]}>
       {row.map((day, index) => (
         <Day
           date={date}
@@ -224,13 +226,14 @@ function Row({row = [], onPressDay, markedDates = [], date}) {
           day={day}
           onPressDay={onPressDay}
           marked={isMarked(markedDates, day.isoString)}
+          styles={styles}
         />
       ))}
     </View>
   );
 }
 
-function Day({day, onPressDay, marked, date}) {
+function Day({day, onPressDay, marked, date, styles}) {
   const onPress = useCallback(() => onPressDay(day.isoString), [
     day.isoString,
     onPressDay,
@@ -243,16 +246,23 @@ function Day({day, onPressDay, marked, date}) {
     <TouchableOpacity
       onPress={onPress}
       style={[
+        defaultStyles.day,
         styles.day,
-        sameDay ? (today ? styles.today : styles.selected) : undefined,
+        sameDay
+          ? today
+            ? styles.today || defaultStyles.today
+            : styles.selected || defaultStyles.selected
+          : undefined,
       ]}>
       <Text
         style={[
-          thisMonth ? styles.sameMonth : styles.dayText,
+          thisMonth
+            ? styles.sameMonth || defaultStyles.sameMonth
+            : styles.dayText || defaultStyles.dayText,
           today
             ? sameDay
-              ? styles.todayText
-              : styles.todayTextBlur
+              ? styles.todayText || defaultStyles.todayText
+              : styles.todayTextBlur || defaultStyles.todayTextBlur
             : undefined,
         ]}>
         {day.date}
@@ -262,12 +272,14 @@ function Day({day, onPressDay, marked, date}) {
   );
 }
 
-function WeekHeader({names = DAYS_OF_WEEK}) {
+function WeekHeader({names = DAYS_OF_WEEK, styles}) {
   return (
-    <View style={[styles.weekHeader]}>
+    <View style={[defaultStyles.weekHeader, styles.weekHeader]}>
       {names.map((name, index) => (
-        <View key={index} style={[styles.weekday]}>
-          <Text style={[styles.weekHeaderText]}>{name}</Text>
+        <View key={index} style={[defaultStyles.weekday, styles.weekday]}>
+          <Text style={[defaultStyles.weekHeaderText, styles.weekHeaderText]}>
+            {name}
+          </Text>
         </View>
       ))}
     </View>
@@ -276,19 +288,24 @@ function WeekHeader({names = DAYS_OF_WEEK}) {
 
 function MonthHeader({title}) {
   return (
-    <View style={[styles.monthHeader]}>
-      <Text style={[styles.monthHeaderText]}>{title}</Text>
+    <View style={[defaultStyles.monthHeader]}>
+      <Text style={[defaultStyles.monthHeaderText]}>{title}</Text>
     </View>
   );
 }
 
 function Dot({contrast}) {
   return (
-    <View style={[styles.dot, contrast ? styles.contrastDot : undefined]} />
+    <View
+      style={[
+        defaultStyles.dot,
+        contrast ? defaultStyles.contrastDot : undefined,
+      ]}
+    />
   );
 }
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
   container: {
     backgroundColor: colors.backgroundColor,
     padding: 4,
