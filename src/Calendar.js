@@ -6,6 +6,7 @@ import {
   Animated,
   TouchableOpacity,
   PanResponder,
+  Dimensions,
 } from 'react-native';
 import {
   getDate,
@@ -31,6 +32,7 @@ import {
 
 const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
 const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
+const {width} = Dimensions.get('window');
 
 export default function SimpleCalendar({
   markedDates = mockMarkedDates,
@@ -139,18 +141,24 @@ class Calendar extends React.Component {
         <MonthHeader title={formatMonthHeader(date)} />
         <WeekHeader names={daysOfWeek} />
         <Animated.ScrollView
-          bounces={false}
-          decelerationRate="fast"
           showsVerticalScrollIndicator={false}
-          scrollEnabled={false}>
-          <Animated.View
+          scrollEnabled={false}
+          style={{
+            height: this.scrollY.interpolate({
+              inputRange: [0, CALENDAR_HEIGHT],
+              outputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
+              extrapolate: 'clamp',
+            }),
+          }}>
+          <Animated.ScrollView
+            horizontal
+            bounces={false}
+            snapToInterval={width - 8}
+            decelerationRate="fast"
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.months}
             style={[
               {
-                height: this.scrollY.interpolate({
-                  inputRange: [0, CALENDAR_HEIGHT],
-                  outputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
-                  extrapolate: 'clamp',
-                }),
                 transform: [
                   {
                     translateY: this.scrollY.interpolate({
@@ -166,9 +174,19 @@ class Calendar extends React.Component {
               rows={rows}
               date={date}
               onDateSelected={this.onDateSelected}
+            />
+            <Rows
+              rows={rows}
+              date={date}
+              onDateSelected={this.onDateSelected}
               markedDates={markedDates}
             />
-          </Animated.View>
+            <Rows
+              rows={rows}
+              date={date}
+              onDateSelected={this.onDateSelected}
+            />
+          </Animated.ScrollView>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
           <Knob animation={this.scrollY} />
@@ -181,7 +199,7 @@ class Calendar extends React.Component {
 function Rows({rows = [], date, markedDates, onDateSelected}) {
   const styles = useContext(ThemeContext);
   return (
-    <View style={styles.month}>
+    <View style={styles.rows}>
       {rows.map((row, index) => (
         <Row
           date={date}
@@ -369,6 +387,13 @@ const defaultStyles = (colors = COLORS) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
+    rows: {
+      width: width - 8, // 8 is the total horizontal padding on the container
+      justifyContent: 'center',
+    },
+    months: {
+      flexGrow: 1,
+    },
     dot: {
       height: 4,
       width: 4,
@@ -379,9 +404,6 @@ const defaultStyles = (colors = COLORS) =>
     },
     contrastDot: {
       backgroundColor: colors.white,
-    },
-    month: {
-      flex: 1,
     },
     knob: {
       backgroundColor: colors.knob,
