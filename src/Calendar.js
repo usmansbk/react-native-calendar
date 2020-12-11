@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import {
   isSameMonth,
 } from './utils';
 import {
-  colors,
+  COLORS,
   CALENDAR_HEIGHT,
   DAYS_OF_WEEK,
   BUTTON_SIZE,
@@ -38,6 +38,7 @@ export default function SimpleCalendar({
   startDate = getDate(),
   onDateChange = () => null,
   styles = {},
+  colors = COLORS,
 }) {
   const [date, setDate] = useState(startDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,8 +47,8 @@ export default function SimpleCalendar({
     getMonth(date),
   ]);
   const computedStyles = useMemo(
-    () => Object.assign({}, defaultStyles, styles),
-    [styles],
+    () => Object.assign({}, defaultStyles(colors), styles),
+    [styles, colors],
   );
 
   const dateRowIndex = useMemo(() => getDateRow(date), [date]);
@@ -63,14 +64,17 @@ export default function SimpleCalendar({
   );
 
   return (
-    <Calendar
-      rows={currentMonthRows}
-      onDateSelected={onDateSelected}
-      markedDates={markedDates}
-      date={date}
-      dateRowIndex={dateRowIndex}
-      styles={computedStyles}
-    />
+    <ThemeContext.Provider value={computedStyles}>
+      <Calendar
+        rows={currentMonthRows}
+        onDateSelected={onDateSelected}
+        markedDates={markedDates}
+        date={date}
+        dateRowIndex={dateRowIndex}
+        styles={computedStyles}
+        daysOfWeek={DAYS_OF_WEEK}
+      />
+    </ThemeContext.Provider>
   );
 }
 
@@ -131,11 +135,18 @@ class Calendar extends React.Component {
   });
 
   render() {
-    const {markedDates = [], date, dateRowIndex, rows, styles} = this.props;
+    const {
+      markedDates = [],
+      date,
+      dateRowIndex,
+      rows,
+      styles,
+      daysOfWeek,
+    } = this.props;
     return (
       <View style={styles.container}>
-        <MonthHeader title={formatMonthHeader(date)} styles={styles} />
-        <WeekHeader styles={styles} />
+        <MonthHeader title={formatMonthHeader(date)} />
+        <WeekHeader names={daysOfWeek} />
         <Animated.View
           {...this.panResponder.panHandlers}
           style={
@@ -175,7 +186,6 @@ class Calendar extends React.Component {
                   date={date}
                   onDateSelected={this.onDateSelected}
                   markedDates={markedDates}
-                  styles={styles}
                 />
               </Animated.View>
               <Animated.View style={styles.right} />
@@ -196,10 +206,7 @@ class Calendar extends React.Component {
                   ],
                 },
               ]}>
-              <Image
-                source={require('./img/arrow.png')}
-                style={defaultStyles.arrow}
-              />
+              <Image source={require('./img/arrow.png')} style={styles.arrow} />
             </Animated.View>
           </View>
         </Animated.View>
@@ -208,7 +215,8 @@ class Calendar extends React.Component {
   }
 }
 
-function Rows({rows = [], date, markedDates, onDateSelected, styles}) {
+function Rows({rows = [], date, markedDates, onDateSelected}) {
+  const styles = useContext(ThemeContext);
   return (
     <View style={styles.month}>
       {rows.map((row, index) => (
@@ -218,14 +226,14 @@ function Rows({rows = [], date, markedDates, onDateSelected, styles}) {
           row={row}
           onDateSelected={onDateSelected}
           markedDates={markedDates}
-          styles={styles}
         />
       ))}
     </View>
   );
 }
 
-function Row({row = [], onDateSelected, markedDates = [], date, styles}) {
+function Row({row = [], onDateSelected, markedDates = [], date}) {
+  const styles = useContext(ThemeContext);
   return (
     <View style={styles.row}>
       {row.map((day, index) => (
@@ -235,14 +243,14 @@ function Row({row = [], onDateSelected, markedDates = [], date, styles}) {
           day={day}
           onPress={onDateSelected}
           marked={isMarked(markedDates, day.isoString)}
-          styles={styles}
         />
       ))}
     </View>
   );
 }
 
-function Day({day, onPress, marked, date, styles}) {
+function Day({day, onPress, marked, date}) {
+  const styles = useContext(ThemeContext);
   const _onPress = useCallback(() => onPress(day.isoString), [
     day.isoString,
     onPress,
@@ -273,12 +281,13 @@ function Day({day, onPress, marked, date, styles}) {
         ]}>
         {day.date}
       </Text>
-      {marked && <Dot contrast={isTodaysDate && isSelected} styles={styles} />}
+      {marked && <Dot contrast={isTodaysDate && isSelected} />}
     </TouchableOpacity>
   );
 }
 
-function WeekHeader({names = DAYS_OF_WEEK, styles}) {
+function WeekHeader({names = DAYS_OF_WEEK}) {
+  const styles = useContext(ThemeContext);
   return (
     <View style={styles.weekHeader}>
       {names.map((name, index) => (
@@ -290,7 +299,8 @@ function WeekHeader({names = DAYS_OF_WEEK, styles}) {
   );
 }
 
-function MonthHeader({title, styles}) {
+function MonthHeader({title}) {
+  const styles = useContext(ThemeContext);
   return (
     <View style={styles.monthHeader}>
       <Text style={styles.monthHeaderText}>{title}</Text>
@@ -298,103 +308,107 @@ function MonthHeader({title, styles}) {
   );
 }
 
-function Dot({contrast, styles}) {
+function Dot({contrast}) {
+  const styles = useContext(ThemeContext);
   return (
     <View style={[styles.dot, contrast ? styles.contrastDot : undefined]} />
   );
 }
 
-const defaultStyles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.backgroundColor,
-    padding: 4,
-  },
-  monthHeader: {
-    paddingVertical: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  monthHeaderText: {
-    textTransform: 'uppercase',
-    color: colors.black,
-    fontWeight: 'bold',
-  },
-  arrow: {
-    width: 14,
-    height: 14,
-  },
-  footer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: FOOTER_HEIGHT,
-    backgroundColor: colors.white, // PanResponder doesn't work without background color set for View
-  },
-  weekHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  weekHeaderText: {
-    color: colors.gray,
-    textTransform: 'uppercase',
-    fontSize: 12,
-  },
-  weekday: {
-    width: BUTTON_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  day: {
-    width: BUTTON_SIZE,
-    height: BUTTON_SIZE,
-    borderRadius: BUTTON_SIZE / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 2,
-  },
-  dayText: {
-    color: colors.gray,
-  },
-  sameMonth: {
-    color: colors.black,
-  },
-  today: {
-    backgroundColor: colors.primary,
-  },
-  selected: {
-    backgroundColor: colors.lightGray,
-  },
-  todayText: {
-    color: colors.white,
-  },
-  todayTextBlur: {
-    color: colors.primary,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  rows: {
-    height: CALENDAR_HEIGHT,
-  },
-  dot: {
-    height: 4,
-    width: 4,
-    borderRadius: 2,
-    backgroundColor: colors.gray,
-    position: 'absolute',
-    bottom: 10,
-  },
-  contrastDot: {
-    backgroundColor: colors.white,
-  },
-  months: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  month: {
-    flex: 1,
-  },
-  calendarRow: {},
-});
+const defaultStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.backgroundColor,
+      padding: 4,
+    },
+    monthHeader: {
+      paddingVertical: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    monthHeaderText: {
+      textTransform: 'uppercase',
+      color: colors.black,
+      fontWeight: 'bold',
+    },
+    arrow: {
+      width: 14,
+      height: 14,
+    },
+    footer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: FOOTER_HEIGHT,
+      backgroundColor: colors.white, // PanResponder doesn't work without background color set for View
+    },
+    weekHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    weekHeaderText: {
+      color: colors.gray,
+      textTransform: 'uppercase',
+      fontSize: 12,
+    },
+    weekday: {
+      width: BUTTON_SIZE,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 8,
+    },
+    day: {
+      width: BUTTON_SIZE,
+      height: BUTTON_SIZE,
+      borderRadius: BUTTON_SIZE / 2,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 2,
+    },
+    dayText: {
+      color: colors.gray,
+    },
+    sameMonth: {
+      color: colors.black,
+    },
+    today: {
+      backgroundColor: colors.primary,
+    },
+    selected: {
+      backgroundColor: colors.lightGray,
+    },
+    todayText: {
+      color: colors.white,
+    },
+    todayTextBlur: {
+      color: colors.primary,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    rows: {
+      height: CALENDAR_HEIGHT,
+    },
+    dot: {
+      height: 4,
+      width: 4,
+      borderRadius: 2,
+      backgroundColor: colors.gray,
+      position: 'absolute',
+      bottom: 10,
+    },
+    contrastDot: {
+      backgroundColor: colors.white,
+    },
+    months: {
+      flexDirection: 'row',
+      flex: 1,
+    },
+    month: {
+      flex: 1,
+    },
+    calendarRow: {},
+  });
+
+const ThemeContext = React.createContext(defaultStyles(COLORS));

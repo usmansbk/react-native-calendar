@@ -1,6 +1,6 @@
 export const BUTTON_SIZE = 48;
 export const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-export const colors = {
+export const COLORS = {
   black: '#313131',
   gray: '#9A9A9A',
   backgroundColor: 'white',
