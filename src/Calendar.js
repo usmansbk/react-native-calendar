@@ -6,7 +6,6 @@ import {
   Animated,
   TouchableOpacity,
   PanResponder,
-  ScrollView,
 } from 'react-native';
 import {
   getDate,
@@ -139,51 +138,40 @@ class Calendar extends React.Component {
       <View style={styles.container}>
         <MonthHeader title={formatMonthHeader(date)} />
         <WeekHeader names={daysOfWeek} />
-        <Animated.View
-          {...this.panResponder.panHandlers}
-          style={
-            (styles.rows,
-            [
+        <Animated.ScrollView
+          bounces={false}
+          decelerationRate="fast"
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}>
+          <Animated.View
+            style={[
               {
                 height: this.animation.y.interpolate({
                   inputRange: [0, CALENDAR_HEIGHT],
-                  outputRange: [ROW_HEIGHT + FOOTER_HEIGHT, CALENDAR_HEIGHT],
+                  outputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
                   extrapolate: 'clamp',
                 }),
+                transform: [
+                  {
+                    translateY: this.animation.y.interpolate({
+                      inputRange: [0, CALENDAR_HEIGHT],
+                      outputRange: [-ROW_HEIGHT * dateRowIndex, 0],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ],
               },
-            ])
-          }>
-          <ScrollView
-            bounces={false}
-            decelerationRate="fast"
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}>
-            <Animated.View
-              style={[
-                styles.calendarRow,
-                {
-                  transform: [
-                    {
-                      translateY: this.animation.y.interpolate({
-                        inputRange: [0, CALENDAR_HEIGHT],
-                        outputRange: [-ROW_HEIGHT * dateRowIndex, 0],
-                        extrapolate: 'clamp',
-                      }),
-                    },
-                  ],
-                },
-              ]}>
-              <Rows
-                rows={rows}
-                date={date}
-                onDateSelected={this.onDateSelected}
-                markedDates={markedDates}
-              />
-            </Animated.View>
-          </ScrollView>
-          <View style={styles.footer}>
-            <Knob animation={this.animation.y} />
-          </View>
+            ]}>
+            <Rows
+              rows={rows}
+              date={date}
+              onDateSelected={this.onDateSelected}
+              markedDates={markedDates}
+            />
+          </Animated.View>
+        </Animated.ScrollView>
+        <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
+          <Knob animation={this.animation.y} />
         </Animated.View>
       </View>
     );
@@ -380,9 +368,6 @@ const defaultStyles = (colors = COLORS) =>
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-    },
-    rows: {
-      height: CALENDAR_HEIGHT,
     },
     dot: {
       height: 4,
