@@ -52,7 +52,7 @@ export default function SimpleCalendar({
 
   const dateRowIndex = useMemo(() => getDateRow(date), [date]);
 
-  const onPressDay = useCallback(
+  const onDateSelected = useCallback(
     (day) => {
       requestAnimationFrame(() => {
         setDate(day);
@@ -65,7 +65,7 @@ export default function SimpleCalendar({
   return (
     <Calendar
       rows={currentMonthRows}
-      onDateSelected={onPressDay}
+      onDateSelected={onDateSelected}
       markedDates={markedDates}
       date={date}
       dateRowIndex={dateRowIndex}
