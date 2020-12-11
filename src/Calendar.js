@@ -301,7 +301,7 @@ function Dot({contrast}) {
   );
 }
 
-function Arrow({size = 20, animation = new Animated.Value(0)}) {
+function Arrow({size = 20, animation}) {
   const styles = useContext(ThemeContext);
   return (
     <View style={styles.arrowBox}>
