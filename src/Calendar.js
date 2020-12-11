@@ -468,12 +468,12 @@ const defaultStyles = (colors = COLORS) =>
     },
     arrowLeft: {
       height: 4,
-      backgroundColor: colors.arrowGray,
+      backgroundColor: colors.arrow,
       borderRadius: 2,
     },
     arrowRight: {
       height: 4,
-      backgroundColor: colors.arrowGray,
+      backgroundColor: colors.arrow,
       borderRadius: 2,
     },
   });
