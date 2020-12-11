@@ -6,7 +6,7 @@ export const COLORS = {
   primary: '#3498db',
   lightGray: '#ecf0f1',
   white: 'white',
-  arrow: '#d3d3d3',
+  knob: '#d3d3d3',
 };
 export const FOOTER_HEIGHT = 32;
 export const NUMBER_OF_ROWS = 6;

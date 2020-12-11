@@ -20,7 +20,6 @@ import {
   isSameDay,
   isToday,
   isSameMonth,
-  clamp,
 } from './utils';
 import {
   COLORS,
@@ -125,7 +124,6 @@ class Calendar extends React.Component {
         }).start();
       }
     },
-    onPanResponderTerminationRequest: () => true,
   });
 
   render() {
@@ -156,6 +154,8 @@ class Calendar extends React.Component {
             ])
           }>
           <ScrollView
+            bounces={false}
+            decelerationRate="fast"
             showsVerticalScrollIndicator={false}
             scrollEnabled={false}>
             <Animated.View
@@ -182,7 +182,7 @@ class Calendar extends React.Component {
             </Animated.View>
           </ScrollView>
           <View style={styles.footer}>
-            <Arrow animation={this.animation.y} />
+            <Knob animation={this.animation.y} />
           </View>
         </Animated.View>
       </View>
@@ -290,55 +290,21 @@ function Dot({contrast}) {
   );
 }
 
-function Arrow({size = 20, animation}) {
+function Knob({size = 20, animation}) {
   const styles = useContext(ThemeContext);
   return (
-    <View style={styles.arrowBox}>
-      <Animated.View
-        style={[
-          styles.arrowLeft,
-          {
-            width: size,
-            right: animation.interpolate({
-              inputRange: [0, 14, CALENDAR_HEIGHT],
-              outputRange: [-4, -3, -2],
-              extrapolate: 'clamp',
-            }),
-            transform: [
-              {
-                rotateZ: animation.interpolate({
-                  inputRange: [0, ROW_HEIGHT, CALENDAR_HEIGHT],
-                  outputRange: ['0deg', '-30deg', '0deg'],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ],
-          },
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.arrowRight,
-          {
-            width: size,
-            left: animation.interpolate({
-              inputRange: [0, 14, CALENDAR_HEIGHT],
-              outputRange: [-4, -3, -2],
-              extrapolate: 'clamp',
-            }),
-            transform: [
-              {
-                rotateZ: animation.interpolate({
-                  inputRange: [0, ROW_HEIGHT, CALENDAR_HEIGHT],
-                  outputRange: ['0deg', '30deg', '0deg'],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ],
-          },
-        ]}
-      />
-    </View>
+    <Animated.View
+      style={[
+        styles.knob,
+        {
+          width: animation.interpolate({
+            inputRange: [0, CALENDAR_HEIGHT],
+            outputRange: [size, size * 2],
+            extrapolate: 'clamp',
+          }),
+        },
+      ]}
+    />
   );
 }
 
@@ -432,17 +398,9 @@ const defaultStyles = (colors = COLORS) =>
     month: {
       flex: 1,
     },
-    arrowBox: {
-      flexDirection: 'row',
-    },
-    arrowLeft: {
+    knob: {
+      backgroundColor: colors.knob,
       height: 4,
-      backgroundColor: colors.arrow,
-      borderRadius: 2,
-    },
-    arrowRight: {
-      height: 4,
-      backgroundColor: colors.arrow,
       borderRadius: 2,
     },
   });
