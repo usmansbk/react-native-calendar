@@ -388,7 +388,7 @@ const defaultStyles = (colors = COLORS) =>
       height: 4,
       width: 4,
       borderRadius: 2,
-      backgroundColor: colors.gray,
+      backgroundColor: colors.primary,
       position: 'absolute',
       bottom: 10,
     },
