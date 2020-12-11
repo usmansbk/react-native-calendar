@@ -28,6 +28,7 @@ import {
   BUTTON_SIZE,
   ROW_HEIGHT,
   FOOTER_HEIGHT,
+  DAY_FORMAT,
 } from './constants';
 
 const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
@@ -39,11 +40,12 @@ export default function SimpleCalendar({
   onDateChange = () => null,
   styles = {},
   colors = COLORS,
+  dayFormat = DAY_FORMAT,
 }) {
   const [date, setDate] = useState(startDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
-  const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(), []);
+  const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(dayFormat), [dayFormat]);
   const computedStyles = useMemo(
     () => Object.assign({}, defaultStyles(colors), styles),
     [styles, colors],
