@@ -13,6 +13,8 @@ import {
   getDate,
   getMonth,
   getDateRow,
+  getNextMonth,
+  getPreviousMonth,
   formatMonthHeader,
   generateMonthMatrix,
   mockMarkedDates,
@@ -40,7 +42,12 @@ export default function SimpleCalendar({
 }) {
   const [_date, setDate] = useState(date);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const rows = useMemo(() => generateMonthMatrix(_date), [getMonth(_date)]);
+  const currentMonthRows = useMemo(() => generateMonthMatrix(_date), [
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getMonth(_date),
+  ]);
+
+  const months = [currentMonthRows];
   const dateRow = useMemo(() => getDateRow(_date), [_date]);
   const onPressDay = useCallback(
     (day) => {
@@ -54,7 +61,7 @@ export default function SimpleCalendar({
 
   return (
     <Calendar
-      rows={rows}
+      months={months}
       onPressDay={onPressDay}
       markedDates={markedDates}
       date={_date}
@@ -79,11 +86,13 @@ class Calendar extends React.Component {
         y: this.animation.y._value,
       });
     },
-    onPanResponderMove: Animated.event(
-      [null, {dx: this.animation.x, dy: this.animation.y}],
-      {useNativeDriver: false},
-    ),
-    onPanResponderRelease: (_, {dy, vy}) => {
+    onPanResponderMove: (_, {dy, dx}) => {
+      this.animation.setValue({
+        x: dx,
+        y: dy,
+      });
+    },
+    onPanResponderRelease: (_, {dx, dy, vy}) => {
       if (dy > 0) {
         // swipe down
 
@@ -118,7 +127,7 @@ class Calendar extends React.Component {
   });
 
   render() {
-    const {rows = [], markedDates = [], date, dateRow} = this.props;
+    const {markedDates = [], date, dateRow, months} = this.props;
     return (
       <View style={[styles.container]}>
         <MonthHeader title={formatMonthHeader(date)} />
@@ -152,15 +161,19 @@ class Calendar extends React.Component {
                   },
                 ],
               }}>
-              {rows.map((row, index) => (
-                <Row
-                  date={date}
-                  key={index}
-                  row={row}
-                  onPressDay={this.onPressDay}
-                  markedDates={markedDates}
-                />
-              ))}
+              {months.map((rows, index) => {
+                return (
+                  <Animated.View style={[styles.months]}>
+                    <Rows
+                      key={index}
+                      rows={rows}
+                      date={date}
+                      onPressDay={this.onPressDay}
+                      markedDates={markedDates}
+                    />
+                  </Animated.View>
+                );
+              })}
             </Animated.View>
           </ScrollView>
           <View style={[styles.footer]}>
@@ -185,6 +198,22 @@ class Calendar extends React.Component {
       </View>
     );
   }
+}
+
+function Rows({rows = [], date, markedDates, onPressDay}) {
+  return (
+    <View style={styles.month}>
+      {rows.map((row, index) => (
+        <Row
+          date={date}
+          key={index}
+          row={row}
+          onPressDay={onPressDay}
+          markedDates={markedDates}
+        />
+      ))}
+    </View>
+  );
 }
 
 function Row({row = [], onPressDay, markedDates = [], date}) {
@@ -345,5 +374,12 @@ const styles = StyleSheet.create({
   },
   contrastDot: {
     backgroundColor: colors.white,
+  },
+  months: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  month: {
+    flex: 1,
   },
 });

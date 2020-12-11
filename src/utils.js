@@ -12,6 +12,14 @@ export function getMonth(date) {
   return moment(date).month();
 }
 
+export function getNextMonth(date) {
+  return moment(date).add(1, 'month');
+}
+
+export function getPreviousMonth(date) {
+  return moment(date).subtract(1, 'month');
+}
+
 export function formatMonthHeader(date) {
   return moment(date).format('MMMM YYYY');
 }
