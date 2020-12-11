@@ -327,6 +327,7 @@ const defaultStyles = (colors) =>
       paddingVertical: 8,
       justifyContent: 'center',
       alignItems: 'center',
+      flexDirection: 'row',
     },
     monthHeaderText: {
       textTransform: 'uppercase',
@@ -410,7 +411,6 @@ const defaultStyles = (colors) =>
     month: {
       flex: 1,
     },
-    calendarRow: {},
   });
 
 const ThemeContext = React.createContext(defaultStyles(COLORS));
