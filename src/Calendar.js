@@ -84,14 +84,14 @@ class Calendar extends React.Component {
     this.onDateSelected = props.onDateSelected;
   }
 
-  animation = new Animated.ValueXY(0);
+  scrollY = new Animated.Value(0);
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
-      this.animation.extractOffset();
+      this.scrollY.extractOffset();
     },
     onPanResponderMove: (_, {dy}) => {
-      this.animation.y.setValue(dy);
+      this.scrollY.setValue(dy);
     },
     onPanResponderRelease: (_, {dy, vy}) => {
       if (dy > 0) {
@@ -102,13 +102,13 @@ class Calendar extends React.Component {
           vy > MINIMUM_SWIPE_DOWN_VELOCITY
         ) {
           // second row is now visible or swipe down fast
-          Animated.timing(this.animation.y, {
+          Animated.timing(this.scrollY, {
             toValue: CALENDAR_HEIGHT,
             duration: 300,
             useNativeDriver: false,
           }).start();
         } else {
-          Animated.timing(this.animation.y, {
+          Animated.timing(this.scrollY, {
             toValue: 0,
             duration: 300,
             useNativeDriver: false,
@@ -116,7 +116,7 @@ class Calendar extends React.Component {
         }
       } else {
         // swipe up
-        Animated.timing(this.animation.y, {
+        Animated.timing(this.scrollY, {
           toValue: -CALENDAR_HEIGHT,
           duration: 300,
           useNativeDriver: false,
@@ -146,14 +146,14 @@ class Calendar extends React.Component {
           <Animated.View
             style={[
               {
-                height: this.animation.y.interpolate({
+                height: this.scrollY.interpolate({
                   inputRange: [0, CALENDAR_HEIGHT],
                   outputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
                   extrapolate: 'clamp',
                 }),
                 transform: [
                   {
-                    translateY: this.animation.y.interpolate({
+                    translateY: this.scrollY.interpolate({
                       inputRange: [0, CALENDAR_HEIGHT],
                       outputRange: [-ROW_HEIGHT * dateRowIndex, 0],
                       extrapolate: 'clamp',
@@ -171,7 +171,7 @@ class Calendar extends React.Component {
           </Animated.View>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
-          <Knob animation={this.animation.y} />
+          <Knob animation={this.scrollY} />
         </Animated.View>
       </View>
     );
