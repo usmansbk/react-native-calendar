@@ -42,10 +42,7 @@ export default function SimpleCalendar({
 }) {
   const [date, setDate] = useState(startDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const currentMonthRows = useMemo(() => generateMonthMatrix(date), [
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    getMonth(date),
-  ]);
+  const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
   const computedStyles = useMemo(
     () => Object.assign({}, defaultStyles(colors), styles),
     [styles, colors],
@@ -66,7 +63,7 @@ export default function SimpleCalendar({
   return (
     <ThemeContext.Provider value={computedStyles}>
       <Calendar
-        rows={currentMonthRows}
+        rows={rows}
         onDateSelected={onDateSelected}
         markedDates={markedDates}
         date={date}
