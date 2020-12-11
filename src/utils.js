@@ -3,6 +3,7 @@ import moment from 'moment';
 export const NUMBER_OF_ROWS = 6;
 const DAYS_PER_WEEK = 7;
 const DAYS_PER_PAGE = NUMBER_OF_ROWS * DAYS_PER_WEEK;
+const DAY_FORMAT = 'ddd'; // SUN MON TUE WED THU FRI SAT
 
 export function getDate() {
   return moment();
@@ -31,6 +32,17 @@ export function getDateRow(date) {
   const numberOfDaysFromStart = momentDate.diff(firstStartOfWeek, 'days');
 
   return Math.floor(numberOfDaysFromStart / DAYS_PER_WEEK);
+}
+
+export function getDaysOfWeek(format = DAY_FORMAT) {
+  let daysOfWeek = [];
+  let firstDayOfWeek = moment().startOf('week');
+
+  for (let i = 0; i < DAYS_PER_WEEK; i++) {
+    daysOfWeek.push(firstDayOfWeek.clone().add(i, 'day').format(format));
+  }
+
+  return daysOfWeek;
 }
 
 /**

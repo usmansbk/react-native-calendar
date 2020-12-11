@@ -13,6 +13,7 @@ import {
   getDate,
   getMonth,
   getDateRow,
+  getDaysOfWeek,
   formatMonthHeader,
   generateMonthMatrix,
   mockMarkedDates,
@@ -24,7 +25,6 @@ import {
 import {
   COLORS,
   CALENDAR_HEIGHT,
-  DAYS_OF_WEEK,
   BUTTON_SIZE,
   ROW_HEIGHT,
   FOOTER_HEIGHT,
@@ -43,6 +43,7 @@ export default function SimpleCalendar({
   const [date, setDate] = useState(startDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
+  const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(), []);
   const computedStyles = useMemo(
     () => Object.assign({}, defaultStyles(colors), styles),
     [styles, colors],
@@ -283,7 +284,7 @@ function Day({day, onPress, marked, date}) {
   );
 }
 
-function WeekHeader({names = DAYS_OF_WEEK}) {
+function WeekHeader({names}) {
   const styles = useContext(ThemeContext);
   return (
     <View style={styles.weekHeader}>
