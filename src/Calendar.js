@@ -312,7 +312,7 @@ function Arrow({size = 20, animation = new Animated.Value(0)}) {
             width: size,
             right: animation.interpolate({
               inputRange: [0, 14, CALENDAR_HEIGHT],
-              outputRange: [-4, -2, -4],
+              outputRange: [-4, -3, -2],
               extrapolate: 'clamp',
             }),
             transform: [
@@ -334,7 +334,7 @@ function Arrow({size = 20, animation = new Animated.Value(0)}) {
             width: size,
             left: animation.interpolate({
               inputRange: [0, 14, CALENDAR_HEIGHT],
-              outputRange: [-4, -2, -4],
+              outputRange: [-4, -3, -2],
               extrapolate: 'clamp',
             }),
             transform: [
