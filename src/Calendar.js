@@ -50,7 +50,8 @@ export default function SimpleCalendar({
     [styles],
   );
 
-  const dateRow = useMemo(() => getDateRow(date), [date]);
+  const dateRowIndex = useMemo(() => getDateRow(date), [date]);
+
   const onPressDay = useCallback(
     (day) => {
       requestAnimationFrame(() => {
@@ -64,10 +65,10 @@ export default function SimpleCalendar({
   return (
     <Calendar
       rows={currentMonthRows}
-      onPressDay={onPressDay}
+      onDateSelected={onPressDay}
       markedDates={markedDates}
       date={date}
-      dateRow={dateRow}
+      dateRowIndex={dateRowIndex}
       styles={computedStyles}
     />
   );
@@ -76,7 +77,7 @@ export default function SimpleCalendar({
 class Calendar extends React.Component {
   constructor(props) {
     super(props);
-    this.onPressDay = props.onPressDay;
+    this.onDateSelected = props.onDateSelected;
   }
 
   animation = new Animated.ValueXY();
@@ -130,7 +131,7 @@ class Calendar extends React.Component {
   });
 
   render() {
-    const {markedDates = [], date, dateRow, rows, styles} = this.props;
+    const {markedDates = [], date, dateRowIndex, rows, styles} = this.props;
     return (
       <View style={styles.container}>
         <MonthHeader title={formatMonthHeader(date)} styles={styles} />
@@ -160,7 +161,7 @@ class Calendar extends React.Component {
                     {
                       translateY: this.animation.y.interpolate({
                         inputRange: [0, CALENDAR_HEIGHT],
-                        outputRange: [-ROW_HEIGHT * dateRow, 0],
+                        outputRange: [-ROW_HEIGHT * dateRowIndex, 0],
                         extrapolate: 'clamp',
                       }),
                     },
@@ -172,7 +173,7 @@ class Calendar extends React.Component {
                 <Rows
                   rows={rows}
                   date={date}
-                  onPressDay={this.onPressDay}
+                  onDateSelected={this.onDateSelected}
                   markedDates={markedDates}
                   styles={styles}
                 />
@@ -207,7 +208,7 @@ class Calendar extends React.Component {
   }
 }
 
-function Rows({rows = [], date, markedDates, onPressDay, styles}) {
+function Rows({rows = [], date, markedDates, onDateSelected, styles}) {
   return (
     <View style={styles.month}>
       {rows.map((row, index) => (
@@ -215,7 +216,7 @@ function Rows({rows = [], date, markedDates, onPressDay, styles}) {
           date={date}
           key={index}
           row={row}
-          onPressDay={onPressDay}
+          onDateSelected={onDateSelected}
           markedDates={markedDates}
           styles={styles}
         />
@@ -224,7 +225,7 @@ function Rows({rows = [], date, markedDates, onPressDay, styles}) {
   );
 }
 
-function Row({row = [], onPressDay, markedDates = [], date, styles}) {
+function Row({row = [], onDateSelected, markedDates = [], date, styles}) {
   return (
     <View style={styles.row}>
       {row.map((day, index) => (
@@ -232,7 +233,7 @@ function Row({row = [], onPressDay, markedDates = [], date, styles}) {
           date={date}
           key={index}
           day={day}
-          onPressDay={onPressDay}
+          onPress={onDateSelected}
           marked={isMarked(markedDates, day.isoString)}
           styles={styles}
         />
@@ -241,10 +242,10 @@ function Row({row = [], onPressDay, markedDates = [], date, styles}) {
   );
 }
 
-function Day({day, onPressDay, marked, date, styles}) {
-  const onPress = useCallback(() => onPressDay(day.isoString), [
+function Day({day, onPress, marked, date, styles}) {
+  const _onPress = useCallback(() => onPress(day.isoString), [
     day.isoString,
-    onPressDay,
+    onPress,
   ]);
   const sameDay = isSameDay(day.isoString, date);
   const today = isToday(day.isoString);
@@ -252,7 +253,7 @@ function Day({day, onPressDay, marked, date, styles}) {
 
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={_onPress}
       style={[
         styles.day,
         sameDay ? (today ? styles.today : styles.selected) : undefined,
