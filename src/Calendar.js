@@ -194,22 +194,6 @@ class Calendar extends React.Component {
           </ScrollView>
           <View style={styles.footer}>
             <Arrow animation={this.animation.y} />
-            {/* <Animated.View
-              style={[
-                {
-                  transform: [
-                    {
-                      rotateX: this.animation.y.interpolate({
-                        inputRange: [0, CALENDAR_HEIGHT],
-                        outputRange: ['180deg', '0deg'],
-                        extrapolate: 'clamp',
-                      }),
-                    },
-                  ],
-                },
-              ]}>
-              <Image source={require('./img/arrow.png')} style={styles.arrow} />
-            </Animated.View> */}
           </View>
         </Animated.View>
       </View>
