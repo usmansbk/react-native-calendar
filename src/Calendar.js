@@ -154,6 +154,8 @@ class Calendar extends React.Component {
             horizontal
             bounces={false}
             snapToInterval={width - 8}
+            pagingEnabled
+            scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.months}
             style={[
