@@ -40,12 +40,14 @@ export default function SimpleCalendar({
   onDateChange = () => null,
   styles = {},
   colors = COLORS,
-  dayFormat = DAY_FORMAT,
+  dayTitleFormat = DAY_FORMAT,
 }) {
   const [date, setDate] = useState(startDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
-  const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(dayFormat), [dayFormat]);
+  const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(dayTitleFormat), [
+    dayTitleFormat,
+  ]);
   const computedStyles = useMemo(
     () => Object.assign({}, defaultStyles(colors), styles),
     [styles, colors],
