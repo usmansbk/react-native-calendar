@@ -6,7 +6,6 @@ import {
   Animated,
   TouchableOpacity,
   PanResponder,
-  Image,
   ScrollView,
 } from 'react-native';
 import {
@@ -194,7 +193,8 @@ class Calendar extends React.Component {
             </Animated.View>
           </ScrollView>
           <View style={styles.footer}>
-            <Animated.View
+            <Arrow animation={this.animation.y} />
+            {/* <Animated.View
               style={[
                 {
                   transform: [
@@ -209,7 +209,7 @@ class Calendar extends React.Component {
                 },
               ]}>
               <Image source={require('./img/arrow.png')} style={styles.arrow} />
-            </Animated.View>
+            </Animated.View> */}
           </View>
         </Animated.View>
       </View>
@@ -317,7 +317,59 @@ function Dot({contrast}) {
   );
 }
 
-const defaultStyles = (colors) =>
+function Arrow({size = 20, animation = new Animated.Value(0)}) {
+  const styles = useContext(ThemeContext);
+  return (
+    <View style={styles.arrowBox}>
+      <Animated.View
+        style={[
+          styles.arrowLeft,
+          {
+            width: size,
+            right: animation.interpolate({
+              inputRange: [0, 14, CALENDAR_HEIGHT],
+              outputRange: [-4, -2, -4],
+              extrapolate: 'clamp',
+            }),
+            transform: [
+              {
+                rotateZ: animation.interpolate({
+                  inputRange: [0, 14, CALENDAR_HEIGHT],
+                  outputRange: ['0deg', '-30deg', '0deg'],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.arrowRight,
+          {
+            width: size,
+            left: animation.interpolate({
+              inputRange: [0, 14, CALENDAR_HEIGHT],
+              outputRange: [-4, -2, -4],
+              extrapolate: 'clamp',
+            }),
+            transform: [
+              {
+                rotateZ: animation.interpolate({
+                  inputRange: [0, 14, CALENDAR_HEIGHT],
+                  outputRange: ['0deg', '30deg', '0deg'],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ],
+          },
+        ]}
+      />
+    </View>
+  );
+}
+
+const defaultStyles = (colors = COLORS) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.backgroundColor,
@@ -410,6 +462,19 @@ const defaultStyles = (colors) =>
     },
     month: {
       flex: 1,
+    },
+    arrowBox: {
+      flexDirection: 'row',
+    },
+    arrowLeft: {
+      height: 4,
+      backgroundColor: colors.arrowGray,
+      borderRadius: 2,
+    },
+    arrowRight: {
+      height: 4,
+      backgroundColor: colors.arrowGray,
+      borderRadius: 2,
     },
   });
 
