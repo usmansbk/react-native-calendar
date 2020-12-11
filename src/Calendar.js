@@ -318,7 +318,7 @@ function Arrow({size = 20, animation = new Animated.Value(0)}) {
             transform: [
               {
                 rotateZ: animation.interpolate({
-                  inputRange: [0, 14, CALENDAR_HEIGHT],
+                  inputRange: [0, ROW_HEIGHT, CALENDAR_HEIGHT],
                   outputRange: ['0deg', '-30deg', '0deg'],
                   extrapolate: 'clamp',
                 }),
@@ -340,7 +340,7 @@ function Arrow({size = 20, animation = new Animated.Value(0)}) {
             transform: [
               {
                 rotateZ: animation.interpolate({
-                  inputRange: [0, 14, CALENDAR_HEIGHT],
+                  inputRange: [0, ROW_HEIGHT, CALENDAR_HEIGHT],
                   outputRange: ['0deg', '30deg', '0deg'],
                   extrapolate: 'clamp',
                 }),
