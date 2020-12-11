@@ -33,7 +33,7 @@ import {
 const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
 const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
 
-export default function Calendar({
+export default function Component({
   markedDates = mockMarkedDates,
   date = getDate(),
   onDateChange = () => null,
@@ -54,9 +54,7 @@ export default function Calendar({
 
   return (
     <View style={[styles.container]}>
-      <MonthHeader title={formatMonthHeader(_date)} />
-      <WeekHeader />
-      <Rows
+      <Calendar
         rows={rows}
         onPressDay={onPressDay}
         markedDates={markedDates}
@@ -67,7 +65,7 @@ export default function Calendar({
   );
 }
 
-class Rows extends React.Component {
+class Calendar extends React.Component {
   constructor(props) {
     super(props);
     this.onPressDay = props.onPressDay;
@@ -124,63 +122,69 @@ class Rows extends React.Component {
   render() {
     const {rows = [], markedDates = [], date, dateRow} = this.props;
     return (
-      <Animated.View
-        {...this.panResponder.panHandlers}
-        style={
-          (styles.rows,
-          [
-            {
-              height: this.animation.y.interpolate({
-                inputRange: [0, CALENDAR_HEIGHT],
-                outputRange: [ROW_HEIGHT + FOOTER_HEIGHT, CALENDAR_HEIGHT],
-                extrapolate: 'clamp',
-              }),
-            },
-          ])
-        }>
-        <ScrollView showsVerticalScrollIndicator={false} scrollEnabled={false}>
-          <Animated.View
-            style={{
-              transform: [
-                {
-                  translateY: this.animation.y.interpolate({
-                    inputRange: [0, CALENDAR_HEIGHT],
-                    outputRange: [-ROW_HEIGHT * dateRow, 0],
-                    extrapolate: 'clamp',
-                  }),
-                },
-              ],
-            }}>
-            {rows.map((row, index) => (
-              <Row
-                date={date}
-                key={index}
-                row={row}
-                onPressDay={this.onPressDay}
-                markedDates={markedDates}
-              />
-            ))}
-          </Animated.View>
-        </ScrollView>
-        <View style={[styles.footer]}>
-          <Animated.View
-            style={[
+      <View>
+        <MonthHeader title={formatMonthHeader(date)} />
+        <WeekHeader />
+        <Animated.View
+          {...this.panResponder.panHandlers}
+          style={
+            (styles.rows,
+            [
               {
+                height: this.animation.y.interpolate({
+                  inputRange: [0, CALENDAR_HEIGHT],
+                  outputRange: [ROW_HEIGHT + FOOTER_HEIGHT, CALENDAR_HEIGHT],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ])
+          }>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}>
+            <Animated.View
+              style={{
                 transform: [
                   {
-                    rotateX: this.animation.y.interpolate({
+                    translateY: this.animation.y.interpolate({
                       inputRange: [0, CALENDAR_HEIGHT],
-                      outputRange: ['180deg', '0deg'],
+                      outputRange: [-ROW_HEIGHT * dateRow, 0],
                       extrapolate: 'clamp',
                     }),
                   },
                 ],
-              },
-            ]}>
-            <Image source={require('./img/arrow.png')} style={styles.arrow} />
-          </Animated.View>
-        </View>
-      </Animated.View>
+              }}>
+              {rows.map((row, index) => (
+                <Row
+                  date={date}
+                  key={index}
+                  row={row}
+                  onPressDay={this.onPressDay}
+                  markedDates={markedDates}
+                />
+              ))}
+            </Animated.View>
+          </ScrollView>
+          <View style={[styles.footer]}>
+            <Animated.View
+              style={[
+                {
+                  transform: [
+                    {
+                      rotateX: this.animation.y.interpolate({
+                        inputRange: [0, CALENDAR_HEIGHT],
+                        outputRange: ['180deg', '0deg'],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ],
+                },
+              ]}>
+              <Image source={require('./img/arrow.png')} style={styles.arrow} />
+            </Animated.View>
+          </View>
+        </Animated.View>
+      </View>
     );
   }
 }
