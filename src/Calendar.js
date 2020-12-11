@@ -33,7 +33,7 @@ import {
 const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
 const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
 
-export default function Component({
+export default function SimpleCalendar({
   markedDates = mockMarkedDates,
   date = getDate(),
   onDateChange = () => null,
@@ -53,15 +53,13 @@ export default function Component({
   );
 
   return (
-    <View style={[styles.container]}>
-      <Calendar
-        rows={rows}
-        onPressDay={onPressDay}
-        markedDates={markedDates}
-        date={_date}
-        dateRow={dateRow}
-      />
-    </View>
+    <Calendar
+      rows={rows}
+      onPressDay={onPressDay}
+      markedDates={markedDates}
+      date={_date}
+      dateRow={dateRow}
+    />
   );
 }
 
@@ -122,7 +120,7 @@ class Calendar extends React.Component {
   render() {
     const {rows = [], markedDates = [], date, dateRow} = this.props;
     return (
-      <View>
+      <View style={[styles.container]}>
         <MonthHeader title={formatMonthHeader(date)} />
         <WeekHeader />
         <Animated.View
