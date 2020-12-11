@@ -49,7 +49,7 @@ export default function SimpleCalendar({
     dayTitleFormat,
   ]);
   const computedStyles = useMemo(
-    () => Object.assign({}, defaultStyles(colors), styles),
+    () => Object.assign({}, makeStyles(colors), styles),
     [styles, colors],
   );
 
@@ -315,7 +315,7 @@ function Knob({size = 20, animation}) {
   );
 }
 
-const defaultStyles = (colors = COLORS) =>
+const makeStyles = (colors = COLORS) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.backgroundColor,
@@ -413,4 +413,4 @@ const defaultStyles = (colors = COLORS) =>
     },
   });
 
-const ThemeContext = React.createContext(defaultStyles(COLORS));
+const ThemeContext = React.createContext(makeStyles(COLORS));
