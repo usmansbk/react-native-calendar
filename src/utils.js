@@ -105,3 +105,15 @@ export const mockMarkedDates = [
   moment().add(8, 'days').toISOString(),
   moment().add(12, 'days').toISOString(),
 ];
+
+export function clamp(value, a, b) {
+  const min = Math.min(a, b);
+  const max = Math.max(a, b);
+
+  if (value < min) {
+    return min;
+  } else if (value > max) {
+    return max;
+  }
+  return value;
+}

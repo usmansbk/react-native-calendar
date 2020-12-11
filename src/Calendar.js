@@ -20,6 +20,7 @@ import {
   isSameDay,
   isToday,
   isSameMonth,
+  clamp,
 } from './utils';
 import {
   COLORS,
@@ -85,23 +86,16 @@ class Calendar extends React.Component {
     this.onDateSelected = props.onDateSelected;
   }
 
-  animation = new Animated.ValueXY();
+  animation = new Animated.ValueXY(0);
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
-      // using extractOffset doesn't work as expected
-      this.animation.setOffset({
-        x: this.animation.x._value,
-        y: this.animation.y._value,
-      });
+      this.animation.extractOffset();
     },
-    onPanResponderMove: (_, {dy, dx}) => {
-      this.animation.setValue({
-        x: dx,
-        y: dy,
-      });
+    onPanResponderMove: (_, {dy}) => {
+      this.animation.y.setValue(dy);
     },
-    onPanResponderRelease: (_, {dx, dy, vy}) => {
+    onPanResponderRelease: (_, {dy, vy}) => {
       if (dy > 0) {
         // swipe down
 
@@ -114,13 +108,13 @@ class Calendar extends React.Component {
             toValue: CALENDAR_HEIGHT,
             duration: 300,
             useNativeDriver: false,
-          }).start(() => this.animation.flattenOffset());
+          }).start();
         } else {
           Animated.timing(this.animation.y, {
             toValue: 0,
             duration: 300,
             useNativeDriver: false,
-          }).start(() => this.animation.flattenOffset());
+          }).start();
         }
       } else {
         // swipe up
@@ -128,11 +122,10 @@ class Calendar extends React.Component {
           toValue: -CALENDAR_HEIGHT,
           duration: 300,
           useNativeDriver: false,
-        }).start(() => {
-          this.animation.flattenOffset();
-        });
+        }).start();
       }
     },
+    onPanResponderTerminationRequest: () => true,
   });
 
   render() {
@@ -180,16 +173,12 @@ class Calendar extends React.Component {
                   ],
                 },
               ]}>
-              <Animated.View style={[styles.left]} />
-              <Animated.View style={styles.months}>
-                <Rows
-                  rows={rows}
-                  date={date}
-                  onDateSelected={this.onDateSelected}
-                  markedDates={markedDates}
-                />
-              </Animated.View>
-              <Animated.View style={styles.right} />
+              <Rows
+                rows={rows}
+                date={date}
+                onDateSelected={this.onDateSelected}
+                markedDates={markedDates}
+              />
             </Animated.View>
           </ScrollView>
           <View style={styles.footer}>
@@ -439,10 +428,6 @@ const defaultStyles = (colors = COLORS) =>
     },
     contrastDot: {
       backgroundColor: colors.white,
-    },
-    months: {
-      flexDirection: 'row',
-      flex: 1,
     },
     month: {
       flex: 1,
