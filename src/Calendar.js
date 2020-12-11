@@ -157,6 +157,7 @@ class Calendar extends React.Component {
             decelerationRate="fast"
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.months}
+            overScrollMode="never"
             style={[
               {
                 transform: [
