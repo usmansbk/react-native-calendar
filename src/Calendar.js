@@ -20,6 +20,8 @@ import {
   isSameDay,
   isToday,
   isSameMonth,
+  getPreviousMonth,
+  getNextMonth,
 } from './utils';
 import {
   COLORS,
@@ -43,8 +45,6 @@ export default function SimpleCalendar({
   dayTitleFormat = DAY_FORMAT,
 }) {
   const [date, setDate] = useState(startDate);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const rows = useMemo(() => generateMonthMatrix(date), [getMonth(date)]);
   const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(dayTitleFormat), [
     dayTitleFormat,
   ]);
@@ -68,7 +68,6 @@ export default function SimpleCalendar({
   return (
     <ThemeContext.Provider value={computedStyles}>
       <Calendar
-        rows={rows}
         onDateSelected={onDateSelected}
         markedDates={markedDates}
         date={date}
@@ -84,6 +83,10 @@ class Calendar extends React.Component {
   constructor(props) {
     super(props);
     this.onDateSelected = props.onDateSelected;
+    this.state = {
+      date: props.date,
+      months: [generateMonthMatrix(props.date)],
+    };
   }
 
   scrollY = new Animated.Value(0);
@@ -127,12 +130,21 @@ class Calendar extends React.Component {
     },
   });
 
+  static getDerivedStateFromProps(props, state) {
+    if (props.date !== state.date) {
+      return {
+        date: props.date,
+        months: [generateMonthMatrix(props.date)],
+      };
+    }
+    return null;
+  }
+
   render() {
     const {
       markedDates = [],
       date,
       dateRowIndex,
-      rows,
       styles,
       daysOfWeek,
     } = this.props;
@@ -171,22 +183,17 @@ class Calendar extends React.Component {
                 ],
               },
             ]}>
-            <Rows
-              rows={rows}
-              date={date}
-              onDateSelected={this.onDateSelected}
-            />
-            <Rows
-              rows={rows}
-              date={date}
-              onDateSelected={this.onDateSelected}
-              markedDates={markedDates}
-            />
-            <Rows
-              rows={rows}
-              date={date}
-              onDateSelected={this.onDateSelected}
-            />
+            {this.state.months.map((rows, index) => {
+              return (
+                <Rows
+                  key={index}
+                  date={date}
+                  rows={rows}
+                  onDateSelected={this.onDateSelected}
+                  markedDates={markedDates}
+                />
+              );
+            })}
           </Animated.ScrollView>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
