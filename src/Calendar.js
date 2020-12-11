@@ -120,7 +120,7 @@ class Calendar extends React.Component {
         // swipe up
         Animated.timing(this.scrollY, {
           toValue: -CALENDAR_HEIGHT,
-          duration: 300,
+          duration: 200,
           useNativeDriver: false,
         }).start();
       }
