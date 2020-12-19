@@ -262,7 +262,7 @@ function Day({day, onPress, marked, date}) {
   ]);
   const isSelected = isSameDay(day.isoString, date);
   const isTodaysDate = isToday(day.isoString);
-  const isInMonth = isSameMonth(day.isoString, date);
+  const isInMonth = day.isInMonth;
 
   return (
     <TouchableOpacity

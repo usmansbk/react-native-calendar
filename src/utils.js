@@ -75,6 +75,7 @@ export function generateMonthMatrix(date) {
         month: day.month(),
         year: day.year(),
         isoString: day.toISOString(),
+        isInMonth: day.isSame(momentDate, 'month'),
       });
     }
     rows.push(row);
