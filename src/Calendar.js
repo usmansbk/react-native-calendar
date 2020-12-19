@@ -149,12 +149,12 @@ class Calendar extends React.Component {
         {
           date,
         },
-        () => {
-          Animated.timing(this.scrollY, {
-            toValue: 0,
-            useNativeDriver: false,
-          }).start();
-        },
+        // () => {
+        //   Animated.timing(this.scrollY, {
+        //     toValue: 0,
+        //     useNativeDriver: false,
+        //   }).start();
+        // },
       );
     });
   };
