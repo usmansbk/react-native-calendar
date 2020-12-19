@@ -317,9 +317,10 @@ function MonthHeader({months, animation = new Animated.Value()}) {
       style={styles.monthHeaderContainer}
       contentContainerStyle={styles.monthHeaderScrollView}>
       {names.map((name, index) => (
-        <Animated.View
+        <Animated.Text
+          key={name}
           style={[
-            styles.monthHeader,
+            styles.monthHeaderText,
             {
               transform: [
                 {
@@ -339,10 +340,9 @@ function MonthHeader({months, animation = new Animated.Value()}) {
                 },
               ],
             },
-          ]}
-          key={name}>
-          <Text style={styles.monthHeaderText}>{name}</Text>
-        </Animated.View>
+          ]}>
+          {name}
+        </Animated.Text>
       ))}
     </Animated.ScrollView>
   );
@@ -388,17 +388,13 @@ const makeStyles = (colors = COLORS) =>
       justifyContent: 'center',
       alignItems: 'center',
     },
-    monthHeader: {
-      paddingVertical: 8,
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: width - 8,
-    },
     monthHeaderText: {
+      paddingVertical: 8,
       textTransform: 'uppercase',
       color: colors.black,
       textAlign: 'center',
       fontWeight: 'bold',
+      width: width - 8,
     },
     arrow: {
       width: 14,
