@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useMemo} from 'react';
 import {
   View,
   Text,
@@ -43,7 +43,6 @@ export default function SimpleCalendar({
   colors = COLORS,
   dayTitleFormat = DAY_FORMAT,
 }) {
-  const [date, setDate] = useState(startDate);
   const DAYS_OF_WEEK = useMemo(() => getDaysOfWeek(dayTitleFormat), [
     dayTitleFormat,
   ]);
@@ -52,12 +51,9 @@ export default function SimpleCalendar({
     [styles, colors],
   );
 
-  const dateRowIndex = useMemo(() => getDateRow(date), [date]);
-
   const onDateSelected = useCallback(
     (day) => {
       requestAnimationFrame(() => {
-        setDate(day);
         onDateChange?.(day);
       });
     },
@@ -69,8 +65,7 @@ export default function SimpleCalendar({
       <Calendar
         onDateSelected={onDateSelected}
         markedDates={markedDates}
-        date={date}
-        dateRowIndex={dateRowIndex}
+        date={startDate}
         styles={computedStyles}
         daysOfWeek={DAYS_OF_WEEK}
       />
@@ -81,9 +76,8 @@ export default function SimpleCalendar({
 class Calendar extends React.Component {
   constructor(props) {
     super(props);
-    this.onDateSelected = props.onDateSelected;
     this.state = {
-      currentIndex: 1,
+      startDate: props.date,
       date: props.date,
       months: [
         generateMonthMatrix(getPreviousMonth(props.date)),
@@ -136,7 +130,7 @@ class Calendar extends React.Component {
   });
 
   static getDerivedStateFromProps(props, state) {
-    if (props.date !== state.date) {
+    if (props.date !== state.startDate) {
       return {
         date: props.date,
         months: [
@@ -149,14 +143,25 @@ class Calendar extends React.Component {
     return null;
   }
 
+  onDateSelected = (date) => {
+    requestAnimationFrame(() => {
+      this.setState(
+        {
+          date,
+        },
+        () => {
+          Animated.timing(this.scrollY, {
+            toValue: 0,
+            useNativeDriver: false,
+          }).start();
+        },
+      );
+    });
+  };
+
   render() {
-    const {
-      markedDates = [],
-      date,
-      dateRowIndex,
-      styles,
-      daysOfWeek,
-    } = this.props;
+    const {markedDates = [], styles, daysOfWeek} = this.props;
+    const {date} = this.state;
     return (
       <View style={styles.container}>
         <MonthHeader months={this.state.months} animation={this.scrollX} />
@@ -201,7 +206,7 @@ class Calendar extends React.Component {
                   {
                     translateY: this.scrollY.interpolate({
                       inputRange: [0, CALENDAR_HEIGHT],
-                      outputRange: [-ROW_HEIGHT * dateRowIndex, 0],
+                      outputRange: [-ROW_HEIGHT * getDateRow(date), 0],
                       extrapolate: 'clamp',
                     }),
                   },
@@ -215,7 +220,7 @@ class Calendar extends React.Component {
                   date={date}
                   rows={month.rows}
                   onDateSelected={this.onDateSelected}
-                  markedDates={markedDates}
+                  markedDates={[] || markedDates}
                 />
               );
             })}
