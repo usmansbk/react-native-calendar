@@ -85,11 +85,16 @@ class Calendar extends React.Component {
     this.onDateSelected = props.onDateSelected;
     this.state = {
       date: props.date,
-      months: [generateMonthMatrix(props.date)],
+      months: [
+        generateMonthMatrix(getPreviousMonth(props.date)),
+        generateMonthMatrix(props.date),
+        generateMonthMatrix(getNextMonth(props.date)),
+      ],
     };
   }
 
   scrollY = new Animated.Value(0);
+  scrollX = new Animated.Value(0);
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
@@ -134,7 +139,6 @@ class Calendar extends React.Component {
     if (props.date !== state.date) {
       return {
         date: props.date,
-        months: [generateMonthMatrix(props.date)],
       };
     }
     return null;
@@ -150,7 +154,7 @@ class Calendar extends React.Component {
     } = this.props;
     return (
       <View style={styles.container}>
-        <MonthHeader title={formatMonthHeader(date)} />
+        <MonthHeader months={this.state.months} animation={this.scrollX} />
         <WeekHeader names={daysOfWeek} />
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
@@ -170,6 +174,18 @@ class Calendar extends React.Component {
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.months}
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: {
+                    contentOffset: {
+                      x: this.scrollX,
+                    },
+                  },
+                },
+              ],
+              {useNativeDriver: false},
+            )}
             style={[
               {
                 transform: [
@@ -183,12 +199,12 @@ class Calendar extends React.Component {
                 ],
               },
             ]}>
-            {this.state.months.map((rows, index) => {
+            {this.state.months.map((month, index) => {
               return (
                 <Rows
                   key={index}
                   date={date}
-                  rows={rows}
+                  rows={month.rows}
                   onDateSelected={this.onDateSelected}
                   markedDates={markedDates}
                 />
@@ -288,12 +304,47 @@ function WeekHeader({names}) {
   );
 }
 
-function MonthHeader({title}) {
+function MonthHeader({months, animation = new Animated.Value()}) {
   const styles = useContext(ThemeContext);
+  const names = months.map((month) => month.name);
   return (
-    <View style={styles.monthHeader}>
-      <Text style={styles.monthHeaderText}>{title}</Text>
-    </View>
+    <Animated.ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      scrollEnabled={false}
+      snapToInterval={width}
+      pagingEnabled
+      style={styles.monthHeaderContainer}
+      contentContainerStyle={styles.monthHeaderScrollView}>
+      {names.map((name, index) => (
+        <Animated.View
+          style={[
+            styles.monthHeader,
+            {
+              transform: [
+                {
+                  translateX: animation.interpolate({
+                    inputRange: [
+                      (index - 1) * width,
+                      index * width,
+                      (index + 1) * width,
+                    ],
+                    outputRange: [
+                      (index - 1) * -width,
+                      index * -width,
+                      (index + 1) * -width,
+                    ],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ],
+            },
+          ]}
+          key={name}>
+          <Text style={styles.monthHeaderText}>{name}</Text>
+        </Animated.View>
+      ))}
+    </Animated.ScrollView>
   );
 }
 
@@ -328,15 +379,25 @@ const makeStyles = (colors = COLORS) =>
       backgroundColor: colors.backgroundColor,
       padding: 4,
     },
+    monthHeaderContainer: {
+      width: width - 8,
+      flexGrow: 1,
+    },
+    monthHeaderScrollView: {
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     monthHeader: {
       paddingVertical: 8,
       justifyContent: 'center',
       alignItems: 'center',
-      flexDirection: 'row',
+      width: width - 8,
     },
     monthHeaderText: {
       textTransform: 'uppercase',
       color: colors.black,
+      textAlign: 'center',
       fontWeight: 'bold',
     },
     arrow: {

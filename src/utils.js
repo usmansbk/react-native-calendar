@@ -64,7 +64,7 @@ export function generateMonthMatrix(date) {
   const firstDateOfMonth = momentDate.clone().startOf('month');
   const firstStartOfWeek = firstDateOfMonth.clone().startOf('week');
 
-  const grid = [];
+  const rows = [];
 
   for (let i = 0; i < DAYS_PER_PAGE; i += DAYS_PER_WEEK) {
     const row = [];
@@ -77,10 +77,10 @@ export function generateMonthMatrix(date) {
         isoString: day.toISOString(),
       });
     }
-    grid.push(row);
+    rows.push(row);
   }
 
-  return grid;
+  return {name: momentDate.format('MMMM'), rows};
 }
 
 export function isSameMonth(date1, date2) {
