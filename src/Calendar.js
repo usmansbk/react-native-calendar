@@ -177,6 +177,7 @@ class Calendar extends React.Component {
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
+          contentContainerStyle={styles.contentContainerStyle}
           style={{
             height: this.scrollY.interpolate({
               inputRange: [0, CALENDAR_HEIGHT],
@@ -211,20 +212,6 @@ class Calendar extends React.Component {
                   style={[
                     styles.month,
                     {
-                      /* TODO */
-                      // left: this.scrollX.interpolate({
-                      //   inputRange: [
-                      //     (index - 1) * width,
-                      //     index * width,
-                      //     (index + 1) * width,
-                      //   ],
-                      //   outputRange: [
-                      //     (index - 1) * width,
-                      //     index * width,
-                      //     (index + 1) * width,
-                      //   ],
-                      //   extrapolate: 'clamp',
-                      // }),
                       transform: [
                         {
                           translateX: this.scrollX.interpolate({
@@ -431,6 +418,9 @@ const makeStyles = (colors = COLORS) =>
       backgroundColor: colors.backgroundColor,
       padding: HORIZONTAL_PADDING / 2,
     },
+    contentContainerStyle: {
+      flexGrow: 1,
+    },
     monthHeaderContainer: {
       width: CALENDAR_WIDTH,
       flexGrow: 1,
@@ -447,10 +437,6 @@ const makeStyles = (colors = COLORS) =>
       textAlign: 'center',
       fontWeight: 'bold',
       width: CALENDAR_WIDTH,
-    },
-    arrow: {
-      width: 14,
-      height: 14,
     },
     footer: {
       justifyContent: 'center',
@@ -513,9 +499,7 @@ const makeStyles = (colors = COLORS) =>
       flexDirection: 'row',
     },
     month: {
-      backgroundColor: 'red',
       position: 'absolute',
-      left: 0,
       top: 0,
     },
     dot: {
