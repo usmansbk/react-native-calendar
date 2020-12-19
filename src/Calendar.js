@@ -13,13 +13,11 @@ import {
   getMonth,
   getDateRow,
   getDaysOfWeek,
-  formatMonthHeader,
   generateMonthMatrix,
   mockMarkedDates,
   isMarked,
   isSameDay,
   isToday,
-  isSameMonth,
   getPreviousMonth,
   getNextMonth,
 } from './utils';
@@ -139,6 +137,11 @@ class Calendar extends React.Component {
     if (props.date !== state.date) {
       return {
         date: props.date,
+        months: [
+          generateMonthMatrix(getPreviousMonth(props.date)),
+          generateMonthMatrix(props.date),
+          generateMonthMatrix(getNextMonth(props.date)),
+        ],
       };
     }
     return null;
@@ -322,6 +325,15 @@ function MonthHeader({months, animation = new Animated.Value()}) {
           style={[
             styles.monthHeaderText,
             {
+              opacity: animation.interpolate({
+                inputRange: [
+                  (index - 1) * width,
+                  index * width,
+                  (index + 1) * width,
+                ],
+                outputRange: [0, 1, 0],
+                extrapolate: 'clamp',
+              }),
               transform: [
                 {
                   translateX: animation.interpolate({

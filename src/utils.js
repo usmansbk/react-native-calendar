@@ -81,11 +81,7 @@ export function generateMonthMatrix(date) {
     rows.push(row);
   }
 
-  return {name: momentDate.format('MMMM'), rows};
-}
-
-export function isSameMonth(date1, date2) {
-  return moment(date1).isSame(date2, 'month');
+  return {name: formatMonthHeader(momentDate), rows};
 }
 
 export function isToday(date) {
