@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import {
   getDate,
-  getMonth,
   getDateRow,
   getDaysOfWeek,
   generateMonthMatrix,
@@ -33,6 +32,8 @@ import {
 const MINIMUM_SWIPE_DOWN = ROW_HEIGHT;
 const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
 const {width} = Dimensions.get('window');
+const HORIZONTAL_PADDING = 8;
+const CALENDAR_WIDTH = width - HORIZONTAL_PADDING;
 
 export default function SimpleCalendar({
   markedDates = mockMarkedDates,
@@ -82,6 +83,7 @@ class Calendar extends React.Component {
     super(props);
     this.onDateSelected = props.onDateSelected;
     this.state = {
+      currentIndex: 1,
       date: props.date,
       months: [
         generateMonthMatrix(getPreviousMonth(props.date)),
@@ -172,9 +174,13 @@ class Calendar extends React.Component {
           <Animated.ScrollView
             horizontal
             bounces={false}
-            snapToInterval={width - 8}
+            snapToInterval={CALENDAR_WIDTH}
             pagingEnabled
             scrollEventThrottle={16}
+            contentOffset={{
+              y: 0,
+              x: CALENDAR_WIDTH,
+            }}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.months}
             onScroll={Animated.event(
@@ -389,10 +395,10 @@ const makeStyles = (colors = COLORS) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.backgroundColor,
-      padding: 4,
+      padding: HORIZONTAL_PADDING / 2,
     },
     monthHeaderContainer: {
-      width: width - 8,
+      width: CALENDAR_WIDTH,
       flexGrow: 1,
     },
     monthHeaderScrollView: {
@@ -406,7 +412,7 @@ const makeStyles = (colors = COLORS) =>
       color: colors.black,
       textAlign: 'center',
       fontWeight: 'bold',
-      width: width - 8,
+      width: CALENDAR_WIDTH,
     },
     arrow: {
       width: 14,
