@@ -77,6 +77,7 @@ class Calendar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentIndex: 1,
       startDate: props.date,
       date: props.date,
       months: [
@@ -89,6 +90,7 @@ class Calendar extends React.Component {
 
   scrollY = new Animated.Value(0);
   scrollX = new Animated.Value(0);
+
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
@@ -129,6 +131,20 @@ class Calendar extends React.Component {
     },
   });
 
+  horizontalPanResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderMove: Animated.event(
+      [
+        null,
+        {
+          dx: this.scrollX,
+        },
+      ],
+      {useNativeDriver: false},
+    ),
+    onPanResponderRelease: (_, gestureState) => {},
+  });
+
   static getDerivedStateFromProps(props, state) {
     if (props.date !== state.startDate) {
       return {
@@ -145,23 +161,15 @@ class Calendar extends React.Component {
 
   onDateSelected = (date) => {
     requestAnimationFrame(() => {
-      this.setState(
-        {
-          date,
-        },
-        // () => {
-        //   Animated.timing(this.scrollY, {
-        //     toValue: 0,
-        //     useNativeDriver: false,
-        //   }).start();
-        // },
-      );
+      this.setState({
+        date,
+      });
     });
   };
 
   render() {
     const {markedDates = [], styles, daysOfWeek} = this.props;
-    const {date} = this.state;
+    const {date, currentIndex} = this.state;
     return (
       <View style={styles.container}>
         <MonthHeader months={this.state.months} animation={this.scrollX} />
@@ -176,31 +184,9 @@ class Calendar extends React.Component {
               extrapolate: 'clamp',
             }),
           }}>
-          <Animated.ScrollView
-            horizontal
-            bounces={false}
-            snapToInterval={CALENDAR_WIDTH}
-            pagingEnabled
-            scrollEventThrottle={16}
-            contentOffset={{
-              y: 0,
-              x: CALENDAR_WIDTH,
-            }}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.months}
-            onScroll={Animated.event(
-              [
-                {
-                  nativeEvent: {
-                    contentOffset: {
-                      x: this.scrollX,
-                    },
-                  },
-                },
-              ],
-              {useNativeDriver: false},
-            )}
+          <Animated.View
             style={[
+              styles.months,
               {
                 transform: [
                   {
@@ -214,17 +200,60 @@ class Calendar extends React.Component {
               },
             ]}>
             {this.state.months.map((month, index) => {
+              let panHandlers = {};
+              // if (index === currentIndex) {
+              panHandlers = this.horizontalPanResponder.panHandlers;
+              // }
               return (
-                <Rows
+                <Animated.View
                   key={index}
-                  date={date}
-                  rows={month.rows}
-                  onDateSelected={this.onDateSelected}
-                  markedDates={[] || markedDates}
-                />
+                  {...panHandlers}
+                  style={[
+                    styles.month,
+                    {
+                      /* TODO */
+                      // left: this.scrollX.interpolate({
+                      //   inputRange: [
+                      //     (index - 1) * width,
+                      //     index * width,
+                      //     (index + 1) * width,
+                      //   ],
+                      //   outputRange: [
+                      //     (index - 1) * width,
+                      //     index * width,
+                      //     (index + 1) * width,
+                      //   ],
+                      //   extrapolate: 'clamp',
+                      // }),
+                      transform: [
+                        {
+                          translateX: this.scrollX.interpolate({
+                            inputRange: [
+                              (index - 1) * width,
+                              index * width,
+                              (index + 1) * width,
+                            ],
+                            outputRange: [
+                              (index - 1) * width,
+                              index * width,
+                              (index + 1) * width,
+                            ],
+                            extrapolate: 'clamp',
+                          }),
+                        },
+                      ],
+                    },
+                  ]}>
+                  <Rows
+                    date={date}
+                    rows={month.rows}
+                    onDateSelected={this.onDateSelected}
+                    markedDates={[] || markedDates}
+                  />
+                </Animated.View>
               );
             })}
-          </Animated.ScrollView>
+          </Animated.View>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
           <Knob animation={this.scrollY} />
@@ -354,9 +383,9 @@ function MonthHeader({months, animation = new Animated.Value()}) {
                       (index + 1) * width,
                     ],
                     outputRange: [
-                      (index - 1) * -width,
-                      index * -width,
-                      (index + 1) * -width,
+                      (index - 1) * width,
+                      index * width,
+                      (index + 1) * width,
                     ],
                     extrapolate: 'clamp',
                   }),
@@ -480,7 +509,14 @@ const makeStyles = (colors = COLORS) =>
       justifyContent: 'center',
     },
     months: {
-      flexGrow: 1,
+      flex: 1,
+      flexDirection: 'row',
+    },
+    month: {
+      backgroundColor: 'red',
+      position: 'absolute',
+      left: 0,
+      top: 0,
     },
     dot: {
       height: 4,
