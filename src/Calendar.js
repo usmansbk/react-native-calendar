@@ -252,7 +252,6 @@ class Calendar extends React.Component {
     const {markedDates = [], styles, daysOfWeek} = this.props;
     const {date} = this.state;
     const rowIndex = getDateRow(date);
-    console.log(rowIndex);
     return (
       <View style={styles.container}>
         <MonthHeader
