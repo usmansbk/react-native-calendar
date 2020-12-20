@@ -13,6 +13,10 @@ export function getMonth(date) {
   return moment(date).month();
 }
 
+export function getDateMonth(sourceDate, destDate) {
+  return moment(destDate).date(moment(sourceDate).date());
+}
+
 export function getNextMonth(date) {
   return moment(date).add(1, 'month');
 }

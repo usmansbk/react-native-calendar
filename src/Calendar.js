@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {
   getDate,
+  getDateMonth,
   getDateRow,
   getDaysOfWeek,
   generateMonthMatrix,
@@ -168,7 +169,7 @@ class Calendar extends React.Component {
                 (state) => {
                   const date = state.months[0].date;
                   return {
-                    date,
+                    date: getDateMonth(state.date, date),
                     months: [
                       generateMonthMatrix(getPreviousMonth(date)),
                       ...state.months.slice(0, 2),
@@ -182,7 +183,7 @@ class Calendar extends React.Component {
                 (state) => {
                   const date = state.months[2].date;
                   return {
-                    date,
+                    date: getDateMonth(state.date, date),
                     months: [
                       ...state.months.slice(1),
                       generateMonthMatrix(getNextMonth(date)),
