@@ -205,6 +205,18 @@ class Calendar extends React.Component {
     },
   });
 
+  _resetMonth = () => {
+    const date = this.props.date;
+    this.setState({
+      date,
+      months: [
+        generateMonthMatrix(getPreviousMonth(date)),
+        generateMonthMatrix(date),
+        generateMonthMatrix(getNextMonth(date)),
+      ],
+    });
+  };
+
   static getDerivedStateFromProps(props, state) {
     if (props.date !== state.startDate) {
       return {
@@ -232,7 +244,11 @@ class Calendar extends React.Component {
     const {date} = this.state;
     return (
       <View style={styles.container}>
-        <MonthHeader months={this.state.months} animation={this.scrollX} />
+        <MonthHeader
+          months={this.state.months}
+          animation={this.scrollX}
+          resetMonth={this._resetMonth}
+        />
         <WeekHeader names={daysOfWeek} />
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
@@ -261,7 +277,8 @@ class Calendar extends React.Component {
               },
             ]}>
             {this.state.months.map((month, index) => {
-              let panHandlers = this.swipePanResponder.panHandlers;
+              let panHandlers =
+                index === 1 ? this.swipePanResponder.panHandlers : {};
               return (
                 <Animated.View
                   key={index}
@@ -384,7 +401,7 @@ function WeekHeader({names}) {
   );
 }
 
-function MonthHeader({months, animation = new Animated.Value()}) {
+function MonthHeader({months, animation = new Animated.Value(), resetMonth}) {
   const styles = useContext(ThemeContext);
   const names = months.map((month) => month.name);
   return (
@@ -399,6 +416,7 @@ function MonthHeader({months, animation = new Animated.Value()}) {
       {names.map((name) => (
         <Animated.Text
           key={name}
+          onPress={resetMonth}
           style={[
             styles.monthHeaderText,
             {
