@@ -130,10 +130,11 @@ class Calendar extends React.Component {
       }
     },
   });
-  xPanResponder = PanResponder.create({
+  swipePanResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
       this.scrollX.extractOffset();
+      this.scrollX.setValue(0);
     },
     onPanResponderMove: Animated.event(
       [
@@ -145,9 +146,10 @@ class Calendar extends React.Component {
       {useNativeDriver: false},
     ),
     onPanResponderRelease: (_, {dx, vx}) => {
-      if (Math.abs(dx) > CALENDAR_WIDTH * 0.4 || Math.abs(vx) > 0.6) {
+      if (Math.abs(dx) > CALENDAR_WIDTH * 0.4 || Math.abs(vx) > 0.5) {
         Animated.timing(this.scrollX, {
           toValue: dx < 0 ? -CALENDAR_WIDTH : CALENDAR_WIDTH,
+          duration: 300,
           useNativeDriver: false,
         }).start();
       } else {
@@ -215,7 +217,7 @@ class Calendar extends React.Component {
               },
             ]}>
             {this.state.months.map((month, index) => {
-              let panHandlers = this.xPanResponder.panHandlers;
+              let panHandlers = this.swipePanResponder.panHandlers;
               return (
                 <Animated.View
                   key={index}
@@ -235,9 +237,9 @@ class Calendar extends React.Component {
                             outputRange: [
                               (index - 1) * CALENDAR_WIDTH,
                               index * CALENDAR_WIDTH,
-                              (index + 1) * CALENDAR_WIDTH,
+                              (index + 1) * width,
                             ],
-                            // extrapolate: 'clamp',
+                            extrapolate: 'clamp',
                           }),
                         },
                       ],
@@ -364,27 +366,18 @@ function MonthHeader({months, animation = new Animated.Value()}) {
           style={[
             styles.monthHeaderText,
             {
-              opacity: animation.interpolate({
-                inputRange: [
-                  (index - 1) * width,
-                  index * width,
-                  (index + 1) * width,
-                ],
-                outputRange: [0, 1, 0],
-                extrapolate: 'clamp',
-              }),
               transform: [
                 {
                   translateX: animation.interpolate({
                     inputRange: [
-                      (index - 1) * width,
-                      index * width,
-                      (index + 1) * width,
+                      (index - 1) * CALENDAR_WIDTH,
+                      index * CALENDAR_WIDTH,
+                      (index + 1) * CALENDAR_WIDTH,
                     ],
                     outputRange: [
-                      (index - 1) * width,
-                      index * width,
-                      (index + 1) * width,
+                      (index - 1) * CALENDAR_WIDTH,
+                      index * CALENDAR_WIDTH,
+                      (index + 1) * CALENDAR_WIDTH,
                     ],
                     extrapolate: 'clamp',
                   }),
@@ -439,6 +432,7 @@ const makeStyles = (colors = COLORS) =>
     },
     monthHeaderScrollView: {
       height: 40,
+      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
     },
