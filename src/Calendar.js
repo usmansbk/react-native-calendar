@@ -34,6 +34,8 @@ const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
 const {width} = Dimensions.get('window');
 const HORIZONTAL_PADDING = 8;
 const CALENDAR_WIDTH = width - HORIZONTAL_PADDING;
+const MINIMUM_DRAG = CALENDAR_WIDTH * 0.4;
+const MINIMUM_HORIZONTAL_SWIPE = 0.5;
 
 export default function SimpleCalendar({
   markedDates = mockMarkedDates,
@@ -146,7 +148,10 @@ class Calendar extends React.Component {
       {useNativeDriver: false},
     ),
     onPanResponderRelease: (_, {dx, vx}) => {
-      if (Math.abs(dx) > CALENDAR_WIDTH * 0.4 || Math.abs(vx) > 0.5) {
+      if (
+        Math.abs(dx) > MINIMUM_DRAG ||
+        Math.abs(vx) > MINIMUM_HORIZONTAL_SWIPE
+      ) {
         Animated.timing(this.scrollX, {
           toValue: dx < 0 ? -CALENDAR_WIDTH : CALENDAR_WIDTH,
           duration: 300,
@@ -237,9 +242,10 @@ class Calendar extends React.Component {
                             outputRange: [
                               (index - 1) * CALENDAR_WIDTH,
                               index * CALENDAR_WIDTH,
-                              (index + 1) * width,
+                              (index + 1) * CALENDAR_WIDTH,
                             ],
-                            extrapolate: 'clamp',
+                            extrapolateRight: 'clamp',
+                            // extrapolate: 'clamp',
                           }),
                         },
                       ],
