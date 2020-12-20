@@ -42,6 +42,7 @@ export default function SimpleCalendar({
   markedDates = mockMarkedDates,
   startDate = getDate(),
   onDateChange = () => null,
+  onMonthChange = () => null,
   styles = {},
   colors = COLORS,
   dayTitleFormat = DAY_FORMAT,
@@ -58,6 +59,7 @@ export default function SimpleCalendar({
     <ThemeContext.Provider value={computedStyles}>
       <Calendar
         onDateSelected={onDateChange}
+        onMonthChange={onMonthChange}
         markedDates={markedDates}
         date={startDate}
         styles={computedStyles}
@@ -167,7 +169,11 @@ class Calendar extends React.Component {
                     ],
                   };
                 },
-                () => this.scrollX.setValue(0),
+                () => {
+                  this.scrollX.setValue(0);
+                  this.props.onMonthChange &&
+                    this.props.onMonthChange(this.state.date);
+                },
               );
             } else if (dx < 0) {
               this.setState(
@@ -181,7 +187,11 @@ class Calendar extends React.Component {
                     ],
                   };
                 },
-                () => this.scrollX.setValue(0),
+                () => {
+                  this.scrollX.setValue(0);
+                  this.props.onMonthChange &&
+                    this.props.onMonthChange(this.state.date);
+                },
               );
             }
           }
@@ -198,14 +208,19 @@ class Calendar extends React.Component {
 
   _resetMonth = () => {
     const date = this.props.date;
-    this.setState({
-      date,
-      months: [
-        generateMonthMatrix(getPreviousMonth(date)),
-        generateMonthMatrix(date),
-        generateMonthMatrix(getNextMonth(date)),
-      ],
-    });
+    this.setState(
+      {
+        date,
+        months: [
+          generateMonthMatrix(getPreviousMonth(date)),
+          generateMonthMatrix(date),
+          generateMonthMatrix(getNextMonth(date)),
+        ],
+      },
+      () => {
+        this.props.onMonthChange && this.props.onMonthChange(date);
+      },
+    );
   };
 
   static getDerivedStateFromProps(props, state) {
