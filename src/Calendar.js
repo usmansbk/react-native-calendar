@@ -160,6 +160,7 @@ class Calendar extends React.Component {
       } else {
         Animated.timing(this.scrollX, {
           toValue: 0,
+          duration: 200,
           useNativeDriver: false,
         }).start();
       }
@@ -244,8 +245,7 @@ class Calendar extends React.Component {
                               index * CALENDAR_WIDTH,
                               (index + 1) * CALENDAR_WIDTH,
                             ],
-                            extrapolateRight: 'clamp',
-                            // extrapolate: 'clamp',
+                            extrapolate: 'clamp',
                           }),
                         },
                       ],
