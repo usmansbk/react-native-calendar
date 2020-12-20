@@ -302,7 +302,7 @@ class Calendar extends React.Component {
                     date={date}
                     rows={month.rows}
                     onDateSelected={this.onDateSelected}
-                    markedDates={[] || markedDates}
+                    markedDates={index === 1 ? markedDates : []}
                   />
                 </Animated.View>
               );
