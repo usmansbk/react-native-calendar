@@ -284,8 +284,8 @@ class Calendar extends React.Component {
                       transform: [
                         {
                           translateX: this.scrollX.interpolate({
-                            inputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
-                            outputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
+                            inputRange: [-CALENDAR_WIDTH, 0, CALENDAR_WIDTH],
+                            outputRange: [-CALENDAR_WIDTH, 0, CALENDAR_WIDTH],
                             extrapolate: 'clamp',
                           }),
                         },
@@ -417,8 +417,8 @@ function MonthHeader({months, animation = new Animated.Value(), resetMonth}) {
               transform: [
                 {
                   translateX: animation.interpolate({
-                    inputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
-                    outputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
+                    inputRange: [-CALENDAR_WIDTH, 0, CALENDAR_WIDTH],
+                    outputRange: [-CALENDAR_WIDTH, 0, CALENDAR_WIDTH],
                     extrapolate: 'clamp',
                   }),
                 },
