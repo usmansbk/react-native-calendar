@@ -142,7 +142,6 @@ class Calendar extends React.Component {
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
       this.scrollX.extractOffset();
-      this.scrollX.setValue(0);
     },
     onPanResponderMove: Animated.event(
       [
@@ -233,8 +232,10 @@ class Calendar extends React.Component {
 
   onDateSelected = (date) => {
     requestAnimationFrame(() => {
-      this.setState({
-        date,
+      this.setState((state) => {
+        return {
+          date,
+        };
       });
     });
   };
