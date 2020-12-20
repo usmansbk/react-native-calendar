@@ -251,6 +251,8 @@ class Calendar extends React.Component {
   render() {
     const {markedDates = [], styles, daysOfWeek} = this.props;
     const {date} = this.state;
+    const rowIndex = getDateRow(date);
+    console.log(rowIndex);
     return (
       <View style={styles.container}>
         <MonthHeader
@@ -265,26 +267,12 @@ class Calendar extends React.Component {
           contentContainerStyle={styles.contentContainerStyle}
           style={{
             height: this.scrollY.interpolate({
-              inputRange: [0, CALENDAR_HEIGHT],
+              inputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
               outputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
               extrapolate: 'clamp',
             }),
           }}>
-          <Animated.View
-            style={[
-              styles.months,
-              {
-                transform: [
-                  {
-                    translateY: this.scrollY.interpolate({
-                      inputRange: [0, CALENDAR_HEIGHT],
-                      outputRange: [-ROW_HEIGHT * getDateRow(date), 0],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                ],
-              },
-            ]}>
+          <View style={styles.months}>
             {this.state.months.map((month, index) => {
               let panHandlers =
                 index === 1 ? this.swipePanResponder.panHandlers : {};
@@ -304,6 +292,13 @@ class Calendar extends React.Component {
                             extrapolate: 'clamp',
                           }),
                         },
+                        {
+                          translateY: this.scrollY.interpolate({
+                            inputRange: [ROW_HEIGHT, CALENDAR_HEIGHT],
+                            outputRange: [-ROW_HEIGHT * rowIndex, 0],
+                            extrapolate: 'clamp',
+                          }),
+                        },
                       ],
                     },
                   ]}>
@@ -316,7 +311,7 @@ class Calendar extends React.Component {
                 </Animated.View>
               );
             })}
-          </Animated.View>
+          </View>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
           <Knob animation={this.scrollY} />
