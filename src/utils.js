@@ -81,7 +81,7 @@ export function generateMonthMatrix(date) {
     rows.push(row);
   }
 
-  return {name: formatMonthHeader(momentDate), rows};
+  return {date: momentDate, name: formatMonthHeader(momentDate), rows};
 }
 
 export function isToday(date) {

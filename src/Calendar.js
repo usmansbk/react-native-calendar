@@ -162,7 +162,39 @@ class Calendar extends React.Component {
           toValue: dx < 0 ? -CALENDAR_WIDTH : CALENDAR_WIDTH,
           duration: 300,
           useNativeDriver: false,
-        }).start(({finished}) => {});
+        }).start(({finished}) => {
+          if (finished) {
+            if (dx > 0) {
+              this.setState(
+                (state) => {
+                  const date = state.months[0].date;
+                  return {
+                    date,
+                    months: [
+                      generateMonthMatrix(getPreviousMonth(date)),
+                      ...state.months.slice(0, 2),
+                    ],
+                  };
+                },
+                () => this.scrollX.setValue(0),
+              );
+            } else if (dx < 0) {
+              this.setState(
+                (state) => {
+                  const date = state.months[2].date;
+                  return {
+                    date,
+                    months: [
+                      ...state.months.slice(1),
+                      generateMonthMatrix(getNextMonth(date)),
+                    ],
+                  };
+                },
+                () => this.scrollX.setValue(0),
+              );
+            }
+          }
+        });
       } else {
         Animated.timing(this.scrollX, {
           toValue: 0,
@@ -364,7 +396,7 @@ function MonthHeader({months, animation = new Animated.Value()}) {
       pagingEnabled
       style={styles.monthHeaderContainer}
       contentContainerStyle={styles.monthHeaderScrollView}>
-      {names.map((name, index) => (
+      {names.map((name) => (
         <Animated.Text
           key={name}
           style={[
