@@ -35,8 +35,8 @@ const MINIMUM_SWIPE_DOWN_VELOCITY = 0.3;
 const {width} = Dimensions.get('window');
 const HORIZONTAL_PADDING = 8;
 const CALENDAR_WIDTH = width - HORIZONTAL_PADDING;
-const MINIMUM_DRAG = CALENDAR_WIDTH * 0.4;
-const MINIMUM_HORIZONTAL_SWIPE = 0.5;
+const MINIMUM_DRAG = CALENDAR_WIDTH * 0.3;
+const MINIMUM_HORIZONTAL_SWIPE = 0.4;
 
 export default function SimpleCalendar({
   markedDates = mockMarkedDates,
@@ -54,19 +54,10 @@ export default function SimpleCalendar({
     [styles, colors],
   );
 
-  const onDateSelected = useCallback(
-    (day) => {
-      requestAnimationFrame(() => {
-        onDateChange?.(day);
-      });
-    },
-    [onDateChange],
-  );
-
   return (
     <ThemeContext.Provider value={computedStyles}>
       <Calendar
-        onDateSelected={onDateSelected}
+        onDateSelected={onDateChange}
         markedDates={markedDates}
         date={startDate}
         styles={computedStyles}
@@ -233,11 +224,12 @@ class Calendar extends React.Component {
 
   onDateSelected = (date) => {
     requestAnimationFrame(() => {
-      this.setState((state) => {
-        return {
+      this.setState(
+        {
           date,
-        };
-      });
+        },
+        () => this.props.onDateSelected && this.props.onDateSelected(date),
+      );
     });
   };
 
