@@ -275,7 +275,7 @@ class Calendar extends React.Component {
                 index === 1 ? this.swipePanResponder.panHandlers : {};
               return (
                 <Animated.View
-                  key={index}
+                  key={month.name}
                   {...panHandlers}
                   style={[
                     styles.month,
