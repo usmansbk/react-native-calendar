@@ -89,7 +89,7 @@ class Calendar extends React.Component {
   }
 
   scrollY = new Animated.Value(0);
-  scrollX = new Animated.Value(0);
+  scrollX = new Animated.Value(1);
 
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
@@ -131,20 +131,6 @@ class Calendar extends React.Component {
     },
   });
 
-  horizontalPanResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderMove: Animated.event(
-      [
-        null,
-        {
-          dx: this.scrollX,
-        },
-      ],
-      {useNativeDriver: false},
-    ),
-    onPanResponderRelease: (_, gestureState) => {},
-  });
-
   static getDerivedStateFromProps(props, state) {
     if (props.date !== state.startDate) {
       return {
@@ -169,7 +155,7 @@ class Calendar extends React.Component {
 
   render() {
     const {markedDates = [], styles, daysOfWeek} = this.props;
-    const {date, currentIndex} = this.state;
+    const {date} = this.state;
     return (
       <View style={styles.container}>
         <MonthHeader months={this.state.months} animation={this.scrollX} />
@@ -185,9 +171,29 @@ class Calendar extends React.Component {
               extrapolate: 'clamp',
             }),
           }}>
-          <Animated.View
+          <Animated.ScrollView
+            horizontal
+            pagingEnabled
+            snapToInterval={CALENDAR_WIDTH}
+            scrollEventThrottle={16}
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{
+              x: CALENDAR_WIDTH,
+            }}
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: {
+                    contentOffset: {
+                      x: this.scrollX,
+                    },
+                  },
+                },
+              ],
+              {useNativeDriver: false},
+            )}
+            contentContainerStyle={styles.months}
             style={[
-              styles.months,
               {
                 transform: [
                   {
@@ -201,46 +207,17 @@ class Calendar extends React.Component {
               },
             ]}>
             {this.state.months.map((month, index) => {
-              let panHandlers = {};
-              // if (index === currentIndex) {
-              panHandlers = this.horizontalPanResponder.panHandlers;
-              // }
               return (
-                <Animated.View
+                <Rows
                   key={index}
-                  {...panHandlers}
-                  style={[
-                    styles.month,
-                    {
-                      transform: [
-                        {
-                          translateX: this.scrollX.interpolate({
-                            inputRange: [
-                              (index - 1) * width,
-                              index * width,
-                              (index + 1) * width,
-                            ],
-                            outputRange: [
-                              (index - 1) * width,
-                              index * width,
-                              (index + 1) * width,
-                            ],
-                            extrapolate: 'clamp',
-                          }),
-                        },
-                      ],
-                    },
-                  ]}>
-                  <Rows
-                    date={date}
-                    rows={month.rows}
-                    onDateSelected={this.onDateSelected}
-                    markedDates={[] || markedDates}
-                  />
-                </Animated.View>
+                  date={date}
+                  rows={month.rows}
+                  onDateSelected={this.onDateSelected}
+                  markedDates={[] || markedDates}
+                />
               );
             })}
-          </Animated.View>
+          </Animated.ScrollView>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
           <Knob animation={this.scrollY} />
@@ -370,9 +347,9 @@ function MonthHeader({months, animation = new Animated.Value()}) {
                       (index + 1) * width,
                     ],
                     outputRange: [
-                      (index - 1) * width,
-                      index * width,
-                      (index + 1) * width,
+                      (index - 1) * -width,
+                      index * -width,
+                      (index + 1) * -width,
                     ],
                     extrapolate: 'clamp',
                   }),
@@ -495,12 +472,7 @@ const makeStyles = (colors = COLORS) =>
       justifyContent: 'center',
     },
     months: {
-      flex: 1,
-      flexDirection: 'row',
-    },
-    month: {
-      position: 'absolute',
-      top: 0,
+      flexGrow: 1,
     },
     dot: {
       height: 4,
