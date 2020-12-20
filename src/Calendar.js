@@ -171,29 +171,9 @@ class Calendar extends React.Component {
               extrapolate: 'clamp',
             }),
           }}>
-          <Animated.ScrollView
-            horizontal
-            pagingEnabled
-            snapToInterval={CALENDAR_WIDTH}
-            scrollEventThrottle={16}
-            showsHorizontalScrollIndicator={false}
-            contentOffset={{
-              x: CALENDAR_WIDTH,
-            }}
-            onScroll={Animated.event(
-              [
-                {
-                  nativeEvent: {
-                    contentOffset: {
-                      x: this.scrollX,
-                    },
-                  },
-                },
-              ],
-              {useNativeDriver: false},
-            )}
-            contentContainerStyle={styles.months}
+          <Animated.View
             style={[
+              styles.months,
               {
                 transform: [
                   {
@@ -208,16 +188,17 @@ class Calendar extends React.Component {
             ]}>
             {this.state.months.map((month, index) => {
               return (
-                <Rows
-                  key={index}
-                  date={date}
-                  rows={month.rows}
-                  onDateSelected={this.onDateSelected}
-                  markedDates={[] || markedDates}
-                />
+                <Animated.View key={index}>
+                  <Rows
+                    date={date}
+                    rows={month.rows}
+                    onDateSelected={this.onDateSelected}
+                    markedDates={[] || markedDates}
+                  />
+                </Animated.View>
               );
             })}
-          </Animated.ScrollView>
+          </Animated.View>
         </Animated.ScrollView>
         <Animated.View style={styles.footer} {...this.panResponder.panHandlers}>
           <Knob animation={this.scrollY} />
@@ -473,6 +454,7 @@ const makeStyles = (colors = COLORS) =>
     },
     months: {
       flexGrow: 1,
+      flexDirection: 'row',
     },
     dot: {
       height: 4,
