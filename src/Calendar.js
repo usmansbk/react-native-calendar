@@ -91,16 +91,22 @@ class Calendar extends React.Component {
   }
 
   scrollY = new Animated.Value(0);
-  scrollX = new Animated.Value(1);
+  scrollX = new Animated.Value(0);
 
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
       this.scrollY.extractOffset();
     },
-    onPanResponderMove: (_, {dy}) => {
-      this.scrollY.setValue(dy);
-    },
+    onPanResponderMove: Animated.event(
+      [
+        null,
+        {
+          dy: this.scrollY,
+        },
+      ],
+      {useNativeDriver: false},
+    ),
     onPanResponderRelease: (_, {dy, vy}) => {
       if (dy > 0) {
         // swipe down
@@ -156,7 +162,7 @@ class Calendar extends React.Component {
           toValue: dx < 0 ? -CALENDAR_WIDTH : CALENDAR_WIDTH,
           duration: 300,
           useNativeDriver: false,
-        }).start();
+        }).start(({finished}) => {});
       } else {
         Animated.timing(this.scrollX, {
           toValue: 0,
@@ -235,16 +241,8 @@ class Calendar extends React.Component {
                       transform: [
                         {
                           translateX: this.scrollX.interpolate({
-                            inputRange: [
-                              (index - 1) * CALENDAR_WIDTH,
-                              index * CALENDAR_WIDTH,
-                              (index + 1) * CALENDAR_WIDTH,
-                            ],
-                            outputRange: [
-                              (index - 1) * CALENDAR_WIDTH,
-                              index * CALENDAR_WIDTH,
-                              (index + 1) * CALENDAR_WIDTH,
-                            ],
+                            inputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
+                            outputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
                             extrapolate: 'clamp',
                           }),
                         },
@@ -375,16 +373,8 @@ function MonthHeader({months, animation = new Animated.Value()}) {
               transform: [
                 {
                   translateX: animation.interpolate({
-                    inputRange: [
-                      (index - 1) * CALENDAR_WIDTH,
-                      index * CALENDAR_WIDTH,
-                      (index + 1) * CALENDAR_WIDTH,
-                    ],
-                    outputRange: [
-                      (index - 1) * CALENDAR_WIDTH,
-                      index * CALENDAR_WIDTH,
-                      (index + 1) * CALENDAR_WIDTH,
-                    ],
+                    inputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
+                    outputRange: [-CALENDAR_WIDTH, CALENDAR_WIDTH],
                     extrapolate: 'clamp',
                   }),
                 },
