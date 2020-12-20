@@ -41,7 +41,7 @@ const MINIMUM_HORIZONTAL_SWIPE = 0.4;
 export default function SimpleCalendar({
   markedDates = mockMarkedDates,
   startDate = getDate(),
-  onDateChange = () => null,
+  onDateSelect = () => null,
   onMonthChange = () => null,
   styles = {},
   colors = COLORS,
@@ -58,7 +58,7 @@ export default function SimpleCalendar({
   return (
     <ThemeContext.Provider value={computedStyles}>
       <Calendar
-        onDateSelected={onDateChange}
+        onDateSelected={onDateSelect}
         onMonthChange={onMonthChange}
         markedDates={markedDates}
         date={startDate}
