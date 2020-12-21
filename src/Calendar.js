@@ -38,6 +38,14 @@ const CALENDAR_WIDTH = width - HORIZONTAL_PADDING;
 const MINIMUM_DRAG = CALENDAR_WIDTH * 0.3;
 const MINIMUM_HORIZONTAL_SWIPE = 0.4;
 
+const getMonths = (date) => {
+  return [
+    generateMonthMatrix(getPreviousMonth(date)),
+    generateMonthMatrix(date),
+    generateMonthMatrix(getNextMonth(date)),
+  ];
+};
+
 export default function SimpleCalendar({
   markedDates = mockMarkedDates,
   startDate = getDate(),
@@ -76,11 +84,7 @@ class Calendar extends React.Component {
       currentIndex: 1,
       startDate: props.date,
       date: props.date,
-      months: [
-        generateMonthMatrix(getPreviousMonth(props.date)),
-        generateMonthMatrix(props.date),
-        generateMonthMatrix(getNextMonth(props.date)),
-      ],
+      months: getMonths(props.date),
     };
   }
 
@@ -211,11 +215,7 @@ class Calendar extends React.Component {
     this.setState(
       {
         date,
-        months: [
-          generateMonthMatrix(getPreviousMonth(date)),
-          generateMonthMatrix(date),
-          generateMonthMatrix(getNextMonth(date)),
-        ],
+        months: getMonths(date),
       },
       () => {
         this.props.onMonthChange && this.props.onMonthChange(date);
@@ -227,11 +227,7 @@ class Calendar extends React.Component {
     if (props.date !== state.startDate) {
       return {
         date: props.date,
-        months: [
-          generateMonthMatrix(getPreviousMonth(props.date)),
-          generateMonthMatrix(props.date),
-          generateMonthMatrix(getNextMonth(props.date)),
-        ],
+        months: getMonths(props.date),
       };
     }
     return null;
